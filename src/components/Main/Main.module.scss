@@ -2,16 +2,38 @@
   flex: 1;
   background-color: #dedede;
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
 
   &__wrapper {
     position: relative;
     max-width: 1280px;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: flex-start;
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    grid-template-rows: 1fr auto;
+    grid-template-areas:
+      'editor preview'
+      'button button';
     margin: 0 auto;
     padding: 0 20px;
+  }
+}
+
+.main {
+  flex: 1;
+  background-color: #dedede;
+
+  &__wrapper {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 2fr auto;
+    grid-template-rows: 1fr auto;
+    grid-template-areas:
+      'editor preview'
+      'button button';
+    margin: 0 auto;
+    padding: 50px;
+  }
+
+  &__text {
+    text-align: left;
   }
 }
