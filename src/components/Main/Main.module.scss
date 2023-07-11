@@ -1,0 +1,14 @@
+.main {
+  flex: 1;
+  background-color: #dedede;
+
+  &__wrapper {
+    position: relative;
+    max-width: 1280px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+}
