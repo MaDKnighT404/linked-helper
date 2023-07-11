@@ -1,0 +1,17 @@
+.button {
+  padding: 5px 15px;
+  border: 0;
+  border-radius: 15px;
+  color: white;
+  background: #d87093;
+  transition: background 0.25s ease;
+  cursor: pointer;
+
+  &:hover {
+    background-color: #ff82ab;
+  }
+
+  &_change {
+    margin-top: auto;
+  }
+}

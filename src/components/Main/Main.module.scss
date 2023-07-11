@@ -1,13 +1,16 @@
 .main {
   flex: 1;
   background-color: #dedede;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
 
   &__wrapper {
     position: relative;
     max-width: 1280px;
     display: flex;
-    justify-content: center;
-    align-items: center;
+    flex-wrap: wrap;
+    align-items: flex-start;
     margin: 0 auto;
     padding: 0 20px;
   }
