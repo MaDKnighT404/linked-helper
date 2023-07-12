@@ -12,6 +12,12 @@
   }
 
   &_change {
-    grid-area: button;
+    position: fixed;
+    top: 0;
+    left: 0;
+  }
+
+  &_save {
+    grid-area: save_button;
   }
 }

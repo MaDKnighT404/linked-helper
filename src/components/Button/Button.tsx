@@ -7,10 +7,10 @@ const Button = ({
   onClick,
 }: {
   title: string;
-  className: string;
-  onClick: () => void;
+  className?: string;
+  onClick?: () => void;
 }) => {
-  const buttonClasses = classNames(styles.button, styles[className]);
+  const buttonClasses = classNames(styles.button, className && styles[className]);
 
   return (
     <button className={buttonClasses} onClick={onClick}>

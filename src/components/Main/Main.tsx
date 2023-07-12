@@ -1,7 +1,6 @@
 import { useState } from 'react';
+import { MessageTemplateEditor } from '../MessageTemplateEditor';
 import { Button } from '../Button';
-import { Editor } from '../Editor';
-import { Preview } from '../Preview';
 import styles from './Main.module.scss';
 
 const Main = () => {
@@ -56,10 +55,7 @@ const Main = () => {
             repellat laudantium fuga debitis dolore maxime error odio ratione nostrum eligendi
           </p>
         ) : (
-          <>
-            <Editor />
-            <Preview />
-          </>
+          <MessageTemplateEditor />
         )}
 
         <Button

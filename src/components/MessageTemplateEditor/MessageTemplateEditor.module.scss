@@ -1,0 +1,22 @@
+.MessageTemplateEditor {
+  display: grid;
+  height: 100%;
+  grid-template-columns: 2fr 1fr;
+  grid-template-rows: 100px 1fr 50px;
+  grid-template-areas:
+    'title title'
+    'editor preview'
+    'save_button save_button';
+
+  @media (max-width: 640px) {
+    grid-template-rows: 50px 1fr 35px;
+  }
+
+  &__title {
+    grid-area: title;
+
+    @media (max-width: 640px) {
+      font-size: 1.2rem;
+    }
+  }
+}
