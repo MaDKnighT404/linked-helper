@@ -11,6 +11,17 @@
     background-color: #ff82ab;
   }
 
+  &_variable {
+    color: black;
+    background-color: rgb(120, 225, 190);
+    border: none;
+    border-radius: 15px;
+
+    &:hover {
+      background-color: rgb(182, 255, 231);
+    }
+  }
+
   &_change {
     position: absolute;
     top: 5px;

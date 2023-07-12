@@ -1,5 +1,6 @@
 import classNames from 'classnames';
 import styles from './Variables.module.scss';
+import { Button } from '../Button';
 
 const Variables = ({ type }: { type: string }) => {
   if (type === 'preview') {
@@ -43,16 +44,16 @@ const Variables = ({ type }: { type: string }) => {
     return (
       <ul className={editorVariablesListClasses}>
         <li className={editorVariableClasses}>
-          <button className={styles.variable__button}>{`{firstname}`}</button>
+          <Button className="button_variable" title={`{firstname}`} />
         </li>
         <li className={editorVariableClasses}>
-          <button className={styles.variable__button}>{`{lastname}`}</button>
+          <Button className="button_variable" title={`{lastname}`} />
         </li>
         <li className={editorVariableClasses}>
-          <button className={styles.variable__button}>{`{company}`}</button>
+          <Button className="button_variable" title={`{company}`} />
         </li>
         <li className={editorVariableClasses}>
-          <button className={styles.variable__button}>{`{position}`}</button>
+          <Button className="button_variable" title={`{position}`} />
         </li>
       </ul>
     );
