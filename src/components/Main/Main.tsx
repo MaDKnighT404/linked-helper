@@ -13,7 +13,7 @@ const Main = () => {
   return (
     <main className={styles.main}>
       <div className={styles.main__wrapper}>
-        {isOpenEditor ? (
+        {!isOpenEditor ? (
           <p className={styles.main__text}>
             This is application for Message Editor Lorem ipsum dolor, sit amet consectetur
             adipisicing elit. Cupiditate velit mollitia perspiciatis quis dolorem! Voluptatem
@@ -59,7 +59,7 @@ const Main = () => {
         )}
 
         <Button
-          title={isOpenEditor ? 'Message Editor' : 'Main'}
+          title={isOpenEditor ? 'Main' : 'Message Editor'}
           onClick={handleClick}
           className="button_change"
         />

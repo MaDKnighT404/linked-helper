@@ -1,0 +1,31 @@
+.variables-list {
+  display: flex;
+  flex-wrap: wrap;
+  padding: 0;
+  margin: 0;
+
+  &_preview {
+    flex-direction: column;
+  }
+
+  &_editor {
+    flex-direction: row;
+  }
+}
+
+.variable {
+  display: flex;
+  list-style: none;
+
+  gap: 5px;
+
+  &_preview {
+    flex-direction: column;
+    margin: 15px 0;
+  }
+
+  &_editor {
+    flex-direction: row;
+    margin: 5px;
+  }
+}

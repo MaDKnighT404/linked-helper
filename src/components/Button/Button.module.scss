@@ -12,12 +12,19 @@
   }
 
   &_change {
-    position: fixed;
-    top: 0;
-    left: 0;
+    position: absolute;
+    top: 5px;
+    right: 5px;
+
+    @media (max-width: 640px) {
+      width: 50%;
+      transform: translate(-50%);
+    }
   }
 
   &_save {
     grid-area: save_button;
+    width: 100%;
+    margin-top: 20px;
   }
 }

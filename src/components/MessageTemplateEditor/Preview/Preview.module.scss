@@ -1,3 +1,20 @@
 .preview {
   grid-area: preview;
+  text-align: left;
+
+  &__textarea {
+    width: calc(100% - 30px);
+    height: 150px;
+    resize: none;
+    padding: 0;
+    margin: 0;
+    scrollbar-gutter: stable;
+    text-indent: 10px;
+    padding: 15px;
+  }
+
+  &__variables {
+    display: flex;
+    flex-direction: column;
+  }
 }
