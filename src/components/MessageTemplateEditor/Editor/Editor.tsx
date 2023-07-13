@@ -1,4 +1,4 @@
-import { Variables } from '../../Variables';
+import { Variables } from '../Variables';
 import styles from './Editor.module.scss';
 
 const Editor = () => {
@@ -10,7 +10,7 @@ const Editor = () => {
       <Variables type="editor" />
 
       <h4 className={styles.editor__subtitle}>Message template</h4>
-      <textarea className={styles.editor__textarea} defaultValue="123"/>
+      <textarea className={styles.editor__textarea} defaultValue="123" />
     </div>
   );
 };

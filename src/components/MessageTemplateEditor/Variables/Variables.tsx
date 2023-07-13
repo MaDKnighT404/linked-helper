@@ -1,6 +1,6 @@
 import classNames from 'classnames';
 import styles from './Variables.module.scss';
-import { Button } from '../Button';
+import { Button } from '../../Button';
 
 const Variables = ({ type }: { type: string }) => {
   if (type === 'preview') {

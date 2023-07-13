@@ -14,18 +14,12 @@ const MessageTemplateEditor = ({ onClose }: { onClose: () => void }) => {
   return (
     <div className={styles.MessageTemplateEditor}>
       <h1 className={styles.MessageTemplateEditor__title}>Message Template Editor</h1>
-      {isOpenEditor ? <Editor /> : <Preview />}
+      {isOpenEditor ? <Editor /> : <Preview onClose={togglePreview} />}
 
       <div className={styles['MessageTemplateEditor__buttons-wrapper']}>
-        {isOpenEditor ? (
-          <>
             <Button title="Preview" className="button_preview" onClick={togglePreview} />
             <Button title="Save" className="button_save" />
             <Button title="Close editor" className="button_preview" onClick={onClose} />
-          </>
-        ) : (
-          <Button title="Close preview" className="button_preview" onClick={togglePreview} />
-        )}
       </div>
     </div>
   );
