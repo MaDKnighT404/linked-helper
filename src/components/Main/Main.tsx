@@ -4,16 +4,16 @@ import { Button } from '../Button';
 import styles from './Main.module.scss';
 
 const Main = () => {
-  const [isOpenEditor, setIsOpenEditor] = useState(false);
+  const [isOpenMessageTemplateEditor, setIsOpenMessageTemplateEditor] = useState(false);
 
-  const handleClick = () => {
-    setIsOpenEditor((prevStatus) => !prevStatus);
+  const toggleMessageTemplateEditor = () => {
+    setIsOpenMessageTemplateEditor((prevStatus) => !prevStatus);
   };
 
   return (
     <main className={styles.main}>
       <div className={styles.main__wrapper}>
-        {!isOpenEditor ? (
+        {!isOpenMessageTemplateEditor ? (
           <p className={styles.main__text}>
             This is application for Message Editor Lorem ipsum dolor, sit amet consectetur
             adipisicing elit. Cupiditate velit mollitia perspiciatis quis dolorem! Voluptatem
@@ -55,14 +55,16 @@ const Main = () => {
             repellat laudantium fuga debitis dolore maxime error odio ratione nostrum eligendi
           </p>
         ) : (
-          <MessageTemplateEditor />
+          <MessageTemplateEditor onClose={toggleMessageTemplateEditor} />
         )}
 
-        <Button
-          title={isOpenEditor ? 'Main' : 'Message Editor'}
-          onClick={handleClick}
-          className="button_change"
-        />
+        {!isOpenMessageTemplateEditor && (
+          <Button
+            title="Message Editor"
+            onClick={toggleMessageTemplateEditor}
+            className="button_change"
+          />
+        )}
       </div>
     </main>
   );

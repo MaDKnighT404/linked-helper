@@ -13,22 +13,22 @@ const Variables = ({ type }: { type: string }) => {
     return (
       <ul className={previewVariablesListClasses}>
         <li className={previewVariableClasses}>
-          <label className={styles.variable__title}>firstname</label>
+          <label className={styles.variable__label}>firstname :</label>
           <input className={styles.variable__input} type="text" />
         </li>
 
         <li className={previewVariableClasses}>
-          <label className={styles.variable__title}>lastname</label>
+          <label className={styles.variable__label}>lastname :</label>
           <input className={styles.variable__input} type="text" />
         </li>
 
         <li className={previewVariableClasses}>
-          <label className={styles.variable__title}>company</label>
+          <label className={styles.variable__label}>company :</label>
           <input className={styles.variable__input} type="text" />
         </li>
 
         <li className={previewVariableClasses}>
-          <label className={styles.variable__title}>position</label>
+          <label className={styles.variable__label}>position :</label>
           <input className={styles.variable__input} type="text" />
         </li>
       </ul>

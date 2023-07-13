@@ -1,23 +1,19 @@
 .MessageTemplateEditor {
-  display: grid;
+  display: flex;
+  flex-direction: column;
   height: 100%;
-  grid-template-columns: 2fr 1fr;
-  grid-template-rows: 100px 1fr 50px;
-  gap: 20px;
-  grid-template-areas:
-    'title title'
-    'editor preview'
-    'save_button save_button';
-
-  @media (max-width: 640px) {
-    display: block;
-  }
 
   &__title {
-    grid-area: title;
-
     @media (max-width: 640px) {
       font-size: 1.2rem;
     }
+  }
+
+  &__buttons-wrapper {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 20px;
   }
 }

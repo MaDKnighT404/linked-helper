@@ -16,16 +16,23 @@
 .variable {
   display: flex;
   list-style: none;
-
   gap: 5px;
+
+  &_editor {
+    margin: 5px;
+  }
 
   &_preview {
     flex-direction: column;
     margin: 15px 0;
+    gap: 10px;
   }
 
-  &_editor {
-    flex-direction: row;
-    margin: 5px;
+  &__label {
+    font-style: italic;
+  }
+
+  &__input {
+    max-width: 500px;
   }
 }
