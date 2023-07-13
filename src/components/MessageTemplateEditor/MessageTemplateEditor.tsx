@@ -17,9 +17,9 @@ const MessageTemplateEditor = ({ onClose }: { onClose: () => void }) => {
       {isOpenEditor ? <Editor /> : <Preview onClose={togglePreview} />}
 
       <div className={styles['MessageTemplateEditor__buttons-wrapper']}>
-            <Button title="Preview" className="button_preview" onClick={togglePreview} />
-            <Button title="Save" className="button_save" />
-            <Button title="Close editor" className="button_preview" onClick={onClose} />
+        <Button title="Preview" className="button_preview" onClick={togglePreview} />
+        <Button title="Save" className="button_save" />
+        <Button title="Close editor" className="button_preview" onClick={onClose} />
       </div>
     </div>
   );
