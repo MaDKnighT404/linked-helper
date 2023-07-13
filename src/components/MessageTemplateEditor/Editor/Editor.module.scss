@@ -12,3 +12,16 @@
     padding: 15px;
   }
 }
+
+.variables-list-editor {
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.variable {
+  margin: 5px;
+}

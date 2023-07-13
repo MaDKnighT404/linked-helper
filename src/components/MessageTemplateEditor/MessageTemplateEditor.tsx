@@ -5,6 +5,10 @@ import { Preview } from './Preview';
 import styles from './MessageTemplateEditor.module.scss';
 
 const MessageTemplateEditor = ({ onClose }: { onClose: () => void }) => {
+  const arrVarNames = localStorage.arrVarNames
+    ? JSON.parse(localStorage.arrVarNames)
+    : ['firstname', 'lastname', 'company', 'position'];
+
   const [isOpenEditor, setIsOpenEditor] = useState(true);
 
   const togglePreview = () => {
@@ -14,12 +18,16 @@ const MessageTemplateEditor = ({ onClose }: { onClose: () => void }) => {
   return (
     <div className={styles.MessageTemplateEditor}>
       <h1 className={styles.MessageTemplateEditor__title}>Message Template Editor</h1>
-      {isOpenEditor ? <Editor /> : <Preview onClose={togglePreview} />}
+      {isOpenEditor ? (
+        <Editor variablesList={arrVarNames} />
+      ) : (
+        <Preview onClose={togglePreview} variablesList={arrVarNames} />
+      )}
 
       <div className={styles['MessageTemplateEditor__buttons-wrapper']}>
-        <Button title="Preview" className="button_preview" onClick={togglePreview} />
-        <Button title="Save" className="button_save" />
-        <Button title="Close editor" className="button_preview" onClick={onClose} />
+        <Button title="Preview" onClick={togglePreview} />
+        <Button title="Save" />
+        <Button title="Close editor" onClick={onClose} />
       </div>
     </div>
   );
