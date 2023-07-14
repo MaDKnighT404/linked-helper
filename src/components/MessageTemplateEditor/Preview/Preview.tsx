@@ -13,6 +13,7 @@ const Preview = ({
   onClose: () => void;
 }) => {
   const [inputValues, setInputValues] = useState<Record<string, string>>({});
+  const [newTemplate, setNewTemplate] = useState(template);
 
   const handleInputChange = (variable: string, value: string) => {
     setInputValues((prevState) => ({
@@ -20,8 +21,6 @@ const Preview = ({
       [variable]: value,
     }));
   };
-
-  const [newTemplate, setNewTemplate] = useState(template);
 
   useEffect(() => {
     const generatedMessage = messageGenerator(template, inputValues);
@@ -34,7 +33,11 @@ const Preview = ({
         <h2 className={styles.preview__title}>Message preview</h2>
 
         <h4 className={styles.preview__subtitle}>Message</h4>
-        <textarea className={styles.preview__textarea} value={newTemplate} readOnly />
+        <textarea
+          className={styles.preview__textarea}
+          value={newTemplate}
+          readOnly
+        />
 
         <h4 className={styles.preview__subtitle}>Variables</h4>
         <ul className={styles['variables-list-preview']}>

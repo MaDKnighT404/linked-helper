@@ -9,28 +9,31 @@ const MessageTemplateEditor = ({ onClose }: { onClose: () => void }) => {
     ? JSON.parse(localStorage.arrVarNames)
     : ['firstname', 'lastname', 'company', 'position'];
 
+  const initialTemplate = `
+  hello {firstname},
+
+this is {lastname}
+
+company is {company}
+
+and position is {position}`;
+
   const [isOpenEditor, setIsOpenEditor] = useState(true);
+  const [template, setTemplate] = useState(initialTemplate);
 
   const togglePreview = () => {
     setIsOpenEditor((prev) => !prev);
   };
 
-  const template = `
-    hello {firstname},
-
-    this is {lastname}
-
-    company is {company}
-
-    and position is {position}
-
-  `;
-
   return (
     <div className={styles.MessageTemplateEditor}>
       <h1 className={styles.MessageTemplateEditor__title}>Message Template Editor</h1>
       {isOpenEditor ? (
-        <Editor variablesList={arrVarNames} />
+        <Editor
+          variablesList={arrVarNames}
+          template={template}
+          setTemplate={setTemplate}
+        />
       ) : (
         <Preview onClose={togglePreview} variablesList={arrVarNames} template={template} />
       )}
