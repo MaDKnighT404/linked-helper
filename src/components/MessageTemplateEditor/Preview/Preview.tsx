@@ -1,13 +1,18 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button } from '../../Button';
 import styles from './Preview.module.scss';
+import { messageGenerator } from '../../../helpers/messageGenerator';
 
-const Preview = ({ variablesList, onClose }: { variablesList: string[]; onClose: () => void }) => {
-  const handlePreviewClick = (event: React.MouseEvent<HTMLDivElement>) => {
-    event.stopPropagation();
-  };
-
-  const [inputValues, setInputValues] = useState({});
+const Preview = ({
+  variablesList,
+  template,
+  onClose,
+}: {
+  variablesList: string[];
+  template: string;
+  onClose: () => void;
+}) => {
+  const [inputValues, setInputValues] = useState<Record<string, string>>({});
 
   const handleInputChange = (variable: string, value: string) => {
     setInputValues((prevState) => ({
@@ -16,14 +21,20 @@ const Preview = ({ variablesList, onClose }: { variablesList: string[]; onClose:
     }));
   };
 
-  console.log(inputValues);
+  const [newTemplate, setNewTemplate] = useState(template);
+
+  useEffect(() => {
+    const generatedMessage = messageGenerator(template, inputValues);
+    setNewTemplate(generatedMessage);
+  }, [inputValues, template]);
+
   return (
     <div className={styles['preview-substrate']}>
-      <div className={styles.preview} onClick={handlePreviewClick}>
+      <div className={styles.preview} onClick={(event) => event.stopPropagation()}>
         <h2 className={styles.preview__title}>Message preview</h2>
 
         <h4 className={styles.preview__subtitle}>Message</h4>
-        <textarea className={styles.preview__textarea} defaultValue="abc" />
+        <textarea className={styles.preview__textarea} value={newTemplate} readOnly />
 
         <h4 className={styles.preview__subtitle}>Variables</h4>
         <ul className={styles['variables-list-preview']}>

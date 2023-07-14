@@ -15,13 +15,24 @@ const MessageTemplateEditor = ({ onClose }: { onClose: () => void }) => {
     setIsOpenEditor((prev) => !prev);
   };
 
+  const template = `
+    hello {firstname},
+
+    this is {lastname}
+
+    company is {company}
+
+    and position is {position}
+
+  `;
+
   return (
     <div className={styles.MessageTemplateEditor}>
       <h1 className={styles.MessageTemplateEditor__title}>Message Template Editor</h1>
       {isOpenEditor ? (
         <Editor variablesList={arrVarNames} />
       ) : (
-        <Preview onClose={togglePreview} variablesList={arrVarNames} />
+        <Preview onClose={togglePreview} variablesList={arrVarNames} template={template} />
       )}
 
       <div className={styles['MessageTemplateEditor__buttons-wrapper']}>
