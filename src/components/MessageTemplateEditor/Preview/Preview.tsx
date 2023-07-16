@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Button } from '../../Button';
 import styles from './Preview.module.scss';
 import { messageGenerator } from '../../../helpers/messageGenerator';
+import { adjustTextareaHeight } from '../../../helpers/adjustTextareaHeight';
 
 const Preview = ({
   variablesList,
@@ -14,6 +15,7 @@ const Preview = ({
 }) => {
   const [inputValues, setInputValues] = useState<Record<string, string>>({});
   const [newTemplate, setNewTemplate] = useState(template);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const handleInputChange = (variable: string, value: string) => {
     setInputValues((prevState) => ({
@@ -25,6 +27,7 @@ const Preview = ({
   useEffect(() => {
     const generatedMessage = messageGenerator(template, inputValues);
     setNewTemplate(generatedMessage);
+    adjustTextareaHeight(textareaRef);
   }, [inputValues, template]);
 
   return (
@@ -34,6 +37,7 @@ const Preview = ({
 
         <h4 className={styles.preview__subtitle}>Message</h4>
         <textarea
+          ref={textareaRef}
           className={styles.preview__textarea}
           value={newTemplate}
           readOnly

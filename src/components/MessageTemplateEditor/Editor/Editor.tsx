@@ -1,5 +1,7 @@
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { Button } from '../../Button';
+import { adjustTextareaHeight } from '../../../helpers/adjustTextareaHeight';
+import { createNewTemplate } from '../../../helpers/createNewTemplate';
 import styles from './Editor.module.scss';
 
 const Editor = ({
@@ -13,20 +15,14 @@ const Editor = ({
 }) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
+  useEffect(() => {
+    adjustTextareaHeight(textareaRef);
+  }, [template]);
+
   const handleVariableButtonClick = (variable: string) => {
-    const textarea = textareaRef.current;
-    if (!textarea) return;
-
-    const startPos = textarea.selectionStart || 0;
-    const endPos = textarea.selectionEnd || 0;
-
-    const newTemplate =
-      template.substring(0, startPos) +
-      `{${variable}}` +
-      template.substring(endPos, template.length);
-
+    const newTemplate = createNewTemplate(textareaRef, template, variable);
     setTemplate(newTemplate);
-    textarea.blur();
+    adjustTextareaHeight(textareaRef);
   };
 
   return (
@@ -52,7 +48,10 @@ const Editor = ({
         ref={textareaRef}
         className={styles.editor__textarea}
         value={template}
-        onChange={(event) => setTemplate(event.target.value)}
+        onChange={(event) => {
+          setTemplate(event.target.value);
+          adjustTextareaHeight(textareaRef);
+        }}
       />
     </div>
   );
