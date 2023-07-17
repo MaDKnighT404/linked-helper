@@ -1,9 +1,10 @@
-import { useState, useEffect, useRef } from 'react';
+import TextareaAutosize from 'react-textarea-autosize';
+import { useState } from 'react';
+import { nanoid } from 'nanoid';
 import { Button } from '../../Button';
-import { adjustTextareaHeight } from '../../../helpers/adjustTextareaHeight';
+import { Condition } from './Condition';
 import { createNewTemplate } from '../../../helpers/createNewTemplate';
 import styles from './Editor.module.scss';
-import { Condition } from './Condition';
 
 const Editor = ({
   variablesList,
@@ -14,21 +15,42 @@ const Editor = ({
   template: string;
   setTemplate: (newTemplate: string) => void;
 }) => {
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const [conditions, setConditions] = useState<number[]>([]);
-
-  useEffect(() => {
-    adjustTextareaHeight(textareaRef);
-  }, [template]);
-
+  const [conditions, setConditions] = useState<string[]>([]);
+  const [cursorPosition, setCursorPosition] = useState<number | null>(null);
+  const [focusedTextAria, setFocusedTextAria] = useState<HTMLTextAreaElement | null>(null);
   const handleVariableButtonClick = (variable: string) => {
-    const newTemplate = createNewTemplate(textareaRef, template, variable);
-    setTemplate(newTemplate);
-    adjustTextareaHeight(textareaRef);
+    // const newTemplate = createNewTemplate(textareaRef, template, variable);
+    // setTemplate(newTemplate);
+    // const textarea = textareaRef.current;
+    // if (!textarea) return '';
+    // const startPos = textarea.selectionStart || 0;
+    // const endPos = textarea.selectionEnd || 0;
+    // const newTemplate =
+    //   template.substring(0, startPos) + `{${variable}}` + template.substring(endPos, template.length);
+    // textarea.blur();
+    // textarea.value = newTemplate;
+    // return newTemplate;
   };
 
-  const handleConditionClick = () => {
-    setConditions((prevConditions) => [...prevConditions, Date.now()]);
+  const handleAddCondition = () => {
+    setConditions((prevConditions) => [...prevConditions, nanoid()]);
+  };
+
+  const handleDeleteCondition = (index: number) => {
+    setConditions((prevConditions) => {
+      const updatedConditions = [...prevConditions];
+      updatedConditions.splice(index, 1);
+      return updatedConditions;
+    });
+  };
+
+  const splitTemplateText = () => {
+    if (cursorPosition !== null) {
+      const textBeforeCursor = template.slice(0, cursorPosition);
+      const textAfterCursor = template.slice(cursorPosition);
+      return { textBeforeCursor, textAfterCursor };
+    }
+    return { textBeforeCursor: template, textAfterCursor: '' };
   };
 
   return (
@@ -52,22 +74,35 @@ const Editor = ({
       <Button
         title="Click to add: IF [{some variable} or expression] THEN [then_value] ELSE [else_value]"
         className="button_condition"
-        onClick={handleConditionClick}
+        onClick={handleAddCondition}
       />
 
       <h4 className={styles.editor__subtitle}>Message template</h4>
       <div className={styles['editor__message-wrapper']}>
-        <textarea
-          ref={textareaRef}
+        <TextareaAutosize
           className={styles.editor__textarea}
-          value={template}
+          value={splitTemplateText().textBeforeCursor}
+          onFocus={(event) => setFocusedTextAria(event.target)}
           onChange={(event) => {
             setTemplate(event.target.value);
-            adjustTextareaHeight(textareaRef);
           }}
         />
         {conditions.map((condition, index) => (
-          <Condition key={condition} />
+          <div key={condition}>
+            <Condition
+              onDelete={() => handleDeleteCondition(index)}
+              setFocusedTextAria={setFocusedTextAria}
+            />
+            <TextareaAutosize
+              className={styles.editor__textarea}
+              value={splitTemplateText().textAfterCursor}
+              onFocus={(event) => setFocusedTextAria(event.target)}
+              onChange={(event) => {
+                const newTemplate = splitTemplateText().textBeforeCursor + event.target.value;
+                setTemplate(newTemplate);
+              }}
+            />
+          </div>
         ))}
       </div>
     </div>

@@ -1,5 +1,4 @@
 .condition {
-
   &__part {
     margin: 15px 0;
   }
@@ -9,19 +8,28 @@
     align-items: center;
   }
 
-  &__state {
-    display: block;
+  &__state-wrapper {
     width: 100px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+  }
+
+  &__state {
+    padding: 5px;
+    border-radius: 5px;
+    color: white;
+    background-color: rgb(96, 141, 29);
   }
 
   &__textaria {
-    width: calc(100% - 150px);
+    width: calc(100% - 130px);
     height: auto;
     resize: none;
     padding: 0;
     margin: 0;
     scrollbar-gutter: stable;
-    text-indent: 15px;
-    padding: 15px;
+    text-indent: 5px;
+    padding: 5px;
   }
 }

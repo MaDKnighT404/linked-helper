@@ -28,9 +28,9 @@
   animation: previewAppear 0.5s;
 
   &__textarea {
-    width: calc(100% - 30px);
+    width: calc(100% - 40px);
     resize: none;
-    padding: 5px;
+    padding: 10px;
     margin: 0;
     scrollbar-gutter: stable;
     text-indent: 15px;
