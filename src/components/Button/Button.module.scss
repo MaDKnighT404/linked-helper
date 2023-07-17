@@ -23,16 +23,24 @@
   }
 
   &_change {
-
   }
 
   &_save {
-
   }
 
   &_preview {
     display: flex;
     margin: 25px auto 0;
+  }
 
+  &_condition {
+    display: flex;
+    margin: 15px auto;
+    background-color: rgb(94, 94, 94);
+    color: white;
+
+    &:hover {
+      background-color: rgb(152, 152, 152);
+    }
   }
 }

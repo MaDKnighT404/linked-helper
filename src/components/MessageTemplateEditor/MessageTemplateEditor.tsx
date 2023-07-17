@@ -18,25 +18,23 @@ company is {company}
 
 and position is {position}`;
 
-  const [isOpenEditor, setIsOpenEditor] = useState(true);
+  const [isOpenPreview, setIsOpenPreview] = useState(false);
   const [template, setTemplate] = useState(initialTemplate);
 
   const togglePreview = () => {
-    setIsOpenEditor((prev) => !prev);
+    setIsOpenPreview((prev) => !prev);
   };
 
   return (
     <div className={styles.MessageTemplateEditor}>
       <h1 className={styles.MessageTemplateEditor__title}>Message Template Editor</h1>
-      {isOpenEditor ? (
-        <Editor
-          variablesList={arrVarNames}
-          template={template}
-          setTemplate={setTemplate}
-        />
-      ) : (
-        <Preview onClose={togglePreview} variablesList={arrVarNames} template={template} />
-      )}
+      <Editor variablesList={arrVarNames} template={template} setTemplate={setTemplate} />
+      <Preview
+        onClose={togglePreview}
+        variablesList={arrVarNames}
+        template={template}
+        isOpen={isOpenPreview}
+      />
 
       <div className={styles['MessageTemplateEditor__buttons-wrapper']}>
         <Button title="Preview" onClick={togglePreview} />

@@ -1,4 +1,5 @@
 .preview-substrate {
+  display: none;
   position: fixed;
   width: 100%;
   height: 100%;
@@ -6,6 +7,10 @@
   left: 0;
   background: rgba(0, 0, 0, 0.8);
   animation: substrateAppear 0.3s;
+
+  &_open {
+    display: block;
+  }
 }
 
 .preview {
@@ -24,12 +29,11 @@
 
   &__textarea {
     width: calc(100% - 30px);
-    height: auto;
     resize: none;
     padding: 5px;
     margin: 0;
     scrollbar-gutter: stable;
-    border: 0;
+    text-indent: 15px;
     outline: none;
     cursor: default;
   }
