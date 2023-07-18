@@ -3,33 +3,36 @@ import { useState } from 'react';
 import { nanoid } from 'nanoid';
 import { Button } from '../../Button';
 import { Condition } from './Condition';
-import { createNewTemplate } from '../../../helpers/createNewTemplate';
+
 import styles from './Editor.module.scss';
 
 const Editor = ({
   variablesList,
-  template,
-  setTemplate,
+  completedTemplate,
+  setCompletedTemplate,
+  onTextareaChange,
 }: {
   variablesList: string[];
-  template: string;
-  setTemplate: (newTemplate: string) => void;
+  completedTemplate: string;
+  setCompletedTemplate: (newTemplate: string) => void;
+  onTextareaChange: (index: number, value: string) => void; 
 }) => {
   const [conditions, setConditions] = useState<string[]>([]);
-  const [cursorPosition, setCursorPosition] = useState<number | null>(null);
   const [focusedTextAria, setFocusedTextAria] = useState<HTMLTextAreaElement | null>(null);
+
   const handleVariableButtonClick = (variable: string) => {
-    // const newTemplate = createNewTemplate(textareaRef, template, variable);
-    // setTemplate(newTemplate);
-    // const textarea = textareaRef.current;
-    // if (!textarea) return '';
-    // const startPos = textarea.selectionStart || 0;
-    // const endPos = textarea.selectionEnd || 0;
-    // const newTemplate =
-    //   template.substring(0, startPos) + `{${variable}}` + template.substring(endPos, template.length);
-    // textarea.blur();
-    // textarea.value = newTemplate;
-    // return newTemplate;
+    if (!focusedTextAria) return;
+    if (focusedTextAria) {
+      const startPos = focusedTextAria.selectionStart || 0;
+      const endPos = focusedTextAria.selectionEnd || 0;
+      const newTemplate =
+        focusedTextAria.value.substring(0, startPos) +
+        `{${variable}}` +
+        focusedTextAria.value.substring(endPos, focusedTextAria.value.length);
+      focusedTextAria.value = newTemplate;
+
+      focusedTextAria.blur();
+    }
   };
 
   const handleAddCondition = () => {
@@ -42,15 +45,6 @@ const Editor = ({
       updatedConditions.splice(index, 1);
       return updatedConditions;
     });
-  };
-
-  const splitTemplateText = () => {
-    if (cursorPosition !== null) {
-      const textBeforeCursor = template.slice(0, cursorPosition);
-      const textAfterCursor = template.slice(cursorPosition);
-      return { textBeforeCursor, textAfterCursor };
-    }
-    return { textBeforeCursor: template, textAfterCursor: '' };
   };
 
   return (
@@ -81,10 +75,11 @@ const Editor = ({
       <div className={styles['editor__message-wrapper']}>
         <TextareaAutosize
           className={styles.editor__textarea}
-          value={splitTemplateText().textBeforeCursor}
+          defaultValue={completedTemplate}
           onFocus={(event) => setFocusedTextAria(event.target)}
           onChange={(event) => {
-            setTemplate(event.target.value);
+            setCompletedTemplate(event.target.value);
+            onTextareaChange(0, event.target.value); // Обновляем состояние в MessageTemplateEditor
           }}
         />
         {conditions.map((condition, index) => (
@@ -92,14 +87,13 @@ const Editor = ({
             <Condition
               onDelete={() => handleDeleteCondition(index)}
               setFocusedTextAria={setFocusedTextAria}
+
             />
             <TextareaAutosize
               className={styles.editor__textarea}
-              value={splitTemplateText().textAfterCursor}
               onFocus={(event) => setFocusedTextAria(event.target)}
               onChange={(event) => {
-                const newTemplate = splitTemplateText().textBeforeCursor + event.target.value;
-                setTemplate(newTemplate);
+                onTextareaChange(index + 1, event.target.value); // Обновляем состояние в MessageTemplateEditor
               }}
             />
           </div>
