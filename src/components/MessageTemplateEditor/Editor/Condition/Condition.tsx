@@ -1,13 +1,22 @@
 import TextareaAutosize from 'react-textarea-autosize';
 import { Button } from '../../../Button';
 import styles from './Condition.module.scss';
+import { CompletedTemplateItem } from '../../../../types';
 
 const Condition = ({
   onDelete,
-  setFocusedTextAria,
+  onTextareaChange,
+  conditionData,
+  index,
 }: {
   onDelete: () => void;
-  setFocusedTextAria: (element: HTMLTextAreaElement | null) => void;
+  onTextareaChange: (
+    event: React.ChangeEvent<HTMLTextAreaElement>,
+    property: keyof CompletedTemplateItem,
+    index: number
+  ) => void;
+  conditionData: CompletedTemplateItem;
+  index: number;
 }) => {
   return (
     <form className={styles.condition}>
@@ -19,7 +28,8 @@ const Condition = ({
           </div>
           <TextareaAutosize
             className={styles.condition__textaria}
-            onFocus={(e) => setFocusedTextAria(e.target)}
+            value={conditionData.if}
+            onChange={(event) => onTextareaChange(event, 'if', index)}
           />
         </label>
       </div>
@@ -31,7 +41,8 @@ const Condition = ({
           </div>
           <TextareaAutosize
             className={styles.condition__textaria}
-            onFocus={(e) => setFocusedTextAria(e.target)}
+            value={conditionData.then}
+            onChange={(event) => onTextareaChange(event, 'then', index)}
           />
         </label>
       </div>
@@ -43,7 +54,8 @@ const Condition = ({
           </div>
           <TextareaAutosize
             className={styles.condition__textaria}
-            onFocus={(e) => setFocusedTextAria(e.target)}
+            value={conditionData.else}
+            onChange={(event) => onTextareaChange(event, 'else', index)}
           />
         </label>
       </div>

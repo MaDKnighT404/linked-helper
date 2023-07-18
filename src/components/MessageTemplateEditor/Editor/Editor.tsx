@@ -1,42 +1,34 @@
 import TextareaAutosize from 'react-textarea-autosize';
-import { useState } from 'react';
+import { Dispatch, useState } from 'react';
 import { nanoid } from 'nanoid';
 import { Button } from '../../Button';
 import { Condition } from './Condition';
 
 import styles from './Editor.module.scss';
+import { CompletedTemplateItem, FocusedItem } from '../../../types';
 
 const Editor = ({
   variablesList,
   completedTemplate,
   setCompletedTemplate,
-  onTextareaChange,
 }: {
   variablesList: string[];
-  completedTemplate: string;
-  setCompletedTemplate: (newTemplate: string) => void;
-  onTextareaChange: (index: number, value: string) => void; 
+  completedTemplate: CompletedTemplateItem[];
+  setCompletedTemplate: Dispatch<React.SetStateAction<CompletedTemplateItem[]>>;
 }) => {
   const [conditions, setConditions] = useState<string[]>([]);
-  const [focusedTextAria, setFocusedTextAria] = useState<HTMLTextAreaElement | null>(null);
+  const [focusedItem, setFocusedItem] = useState<FocusedItem | null>(null);
 
-  const handleVariableButtonClick = (variable: string) => {
-    if (!focusedTextAria) return;
-    if (focusedTextAria) {
-      const startPos = focusedTextAria.selectionStart || 0;
-      const endPos = focusedTextAria.selectionEnd || 0;
-      const newTemplate =
-        focusedTextAria.value.substring(0, startPos) +
-        `{${variable}}` +
-        focusedTextAria.value.substring(endPos, focusedTextAria.value.length);
-      focusedTextAria.value = newTemplate;
-
-      focusedTextAria.blur();
-    }
-  };
+  const handleVariableButtonClick = (variable: string) => {};
 
   const handleAddCondition = () => {
     setConditions((prevConditions) => [...prevConditions, nanoid()]);
+
+    // Add a new empty CompletedTemplateItem to the completedTemplate array
+    setCompletedTemplate((prevCompletedTemplate) => [
+      ...prevCompletedTemplate,
+      { if: '', then: '', else: '', end: '' },
+    ]);
   };
 
   const handleDeleteCondition = (index: number) => {
@@ -45,6 +37,29 @@ const Editor = ({
       updatedConditions.splice(index, 1);
       return updatedConditions;
     });
+
+    setCompletedTemplate((prevCompletedTemplate) =>
+      prevCompletedTemplate.filter((_, i) => i !== index + 1)
+    );
+  };
+
+  const handleTextareaChange = (
+    event: React.ChangeEvent<HTMLTextAreaElement>,
+    property: keyof CompletedTemplateItem,
+    index: number
+  ) => {
+    const updatedCompletedTemplate = completedTemplate.map((item, i) =>
+      i === index ? { ...item, [property]: event.target.value } : item
+    );
+    setCompletedTemplate(updatedCompletedTemplate);
+  };
+
+  const handleTextareaFocus = (
+    event: React.FocusEvent<HTMLTextAreaElement>,
+    property: keyof CompletedTemplateItem,
+    deepLevel: number
+  ) => {
+    setFocusedItem({ focusedTextaria: event.target, deepLevel });
   };
 
   return (
@@ -75,26 +90,23 @@ const Editor = ({
       <div className={styles['editor__message-wrapper']}>
         <TextareaAutosize
           className={styles.editor__textarea}
-          defaultValue={completedTemplate}
-          onFocus={(event) => setFocusedTextAria(event.target)}
-          onChange={(event) => {
-            setCompletedTemplate(event.target.value);
-            onTextareaChange(0, event.target.value); // Обновляем состояние в MessageTemplateEditor
-          }}
+          value={completedTemplate[0].start}
+          onChange={(event) => handleTextareaChange(event, 'start', 0)}
+          onFocus={(event) => handleTextareaFocus(event, 'start', 0)}
         />
         {conditions.map((condition, index) => (
           <div key={condition}>
             <Condition
               onDelete={() => handleDeleteCondition(index)}
-              setFocusedTextAria={setFocusedTextAria}
-
+              onTextareaChange={handleTextareaChange}
+              conditionData={completedTemplate[index + 1]}
+              index={index + 1}
             />
             <TextareaAutosize
               className={styles.editor__textarea}
-              onFocus={(event) => setFocusedTextAria(event.target)}
-              onChange={(event) => {
-                onTextareaChange(index + 1, event.target.value); // Обновляем состояние в MessageTemplateEditor
-              }}
+              value={completedTemplate[index + 1].end}
+              onChange={(event) => handleTextareaChange(event, 'end', index + 1)}
+              onFocus={(event) => handleTextareaFocus(event, 'end', index + 1)}
             />
           </div>
         ))}

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Button } from '../Button';
 import { Editor } from './Editor';
 import { Preview } from './Preview';
+import { CompletedTemplateItem } from '../../types';
 import styles from './MessageTemplateEditor.module.scss';
 
 const MessageTemplateEditor = ({ onClose }: { onClose: () => void }) => {
@@ -19,21 +20,14 @@ company is {company}
 and position is {position}`;
 
   const [isOpenPreview, setIsOpenPreview] = useState(false);
-  const [completedTemplate, setCompletedTemplate] = useState(initialTemplate);
+  const [completedTemplate, setCompletedTemplate] = useState<CompletedTemplateItem[]>([
+    { start: initialTemplate, if: '', then: '', else: '', end: '' },
+  ]);
 
   const togglePreview = () => {
     setIsOpenPreview((prev) => !prev);
   };
-
-  const [allTextareasText, setAllTextareasText] = useState<string[]>([completedTemplate]);
-
-  const handleTextareaChange = (index: number, value: string) => {
-    const newTextareasText = [...allTextareasText];
-    newTextareasText[index] = value;
-    setAllTextareasText(newTextareasText);
-  };
-
-
+  console.log(completedTemplate);
   return (
     <div className={styles.MessageTemplateEditor}>
       <h1 className={styles.MessageTemplateEditor__title}>Message Template Editor</h1>
@@ -41,12 +35,11 @@ and position is {position}`;
         variablesList={arrVarNames}
         completedTemplate={completedTemplate}
         setCompletedTemplate={setCompletedTemplate}
-        onTextareaChange={(index, value) => handleTextareaChange(index, value)}
       />
       <Preview
         onClose={togglePreview}
         variablesList={arrVarNames}
-        template={allTextareasText.join('')} // Объединяем все тексты из TextareaAutosize
+        template={completedTemplate[0].start as string} // need calculate result
         isOpen={isOpenPreview}
       />
 
