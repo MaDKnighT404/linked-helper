@@ -21,33 +21,25 @@ and position is {position}`;
   const [isOpenPreview, setIsOpenPreview] = useState(false);
   const [completedTemplate, setCompletedTemplate] = useState(initialTemplate);
 
+
+
   const togglePreview = () => {
     setIsOpenPreview((prev) => !prev);
   };
-
-  const [allTextareasText, setAllTextareasText] = useState<string[]>([completedTemplate]);
-
-  const handleTextareaChange = (index: number, value: string) => {
-    const newTextareasText = [...allTextareasText];
-    newTextareasText[index] = value;
-    setAllTextareasText(newTextareasText);
-  };
-
 
   return (
     <div className={styles.MessageTemplateEditor}>
       <h1 className={styles.MessageTemplateEditor__title}>Message Template Editor</h1>
       <Editor
+        template={completedTemplate}
         variablesList={arrVarNames}
-        completedTemplate={completedTemplate}
         setCompletedTemplate={setCompletedTemplate}
-        onTextareaChange={(index, value) => handleTextareaChange(index, value)}
       />
       <Preview
-        onClose={togglePreview}
+        template={completedTemplate}
         variablesList={arrVarNames}
-        template={allTextareasText.join('')} // Объединяем все тексты из TextareaAutosize
         isOpen={isOpenPreview}
+        onClose={togglePreview}
       />
 
       <div className={styles['MessageTemplateEditor__buttons-wrapper']}>

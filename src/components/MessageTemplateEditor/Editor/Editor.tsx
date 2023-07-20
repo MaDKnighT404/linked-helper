@@ -8,45 +8,93 @@ import styles from './Editor.module.scss';
 
 const Editor = ({
   variablesList,
-  completedTemplate,
+  template,
   setCompletedTemplate,
-  onTextareaChange,
 }: {
   variablesList: string[];
-  completedTemplate: string;
-  setCompletedTemplate: (newTemplate: string) => void;
-  onTextareaChange: (index: number, value: string) => void; 
+  template: string;
+  setCompletedTemplate: (text: string) => void;
 }) => {
-  const [conditions, setConditions] = useState<string[]>([]);
-  const [focusedTextAria, setFocusedTextAria] = useState<HTMLTextAreaElement | null>(null);
+  const [focusedTextarea, setFocusedTextarea] = useState<HTMLTextAreaElement | null>(null);
+
+  const [textAfterCursorState, setTextAfterCursorState] = useState('');
+
+  const [full, setFull] = useState([
+    { start: '', if: '', then: '', else: '', end: '' },
+    { start: '', if: '', then: '', else: '', end: '' },
+  ]);
 
   const handleVariableButtonClick = (variable: string) => {
-    if (!focusedTextAria) return;
-    if (focusedTextAria) {
-      const startPos = focusedTextAria.selectionStart || 0;
-      const endPos = focusedTextAria.selectionEnd || 0;
-      const newTemplate =
-        focusedTextAria.value.substring(0, startPos) +
-        `{${variable}}` +
-        focusedTextAria.value.substring(endPos, focusedTextAria.value.length);
-      focusedTextAria.value = newTemplate;
-
-      focusedTextAria.blur();
+    if (focusedTextarea) {
+      const { selectionStart, selectionEnd, value } = focusedTextarea;
+      const textBeforeCursor = value.substring(0, selectionStart);
+      const textAfterCursor = value.substring(selectionEnd);
+      const updatedTemplate = `${textBeforeCursor}{${variable}}${textAfterCursor}`;
+      focusedTextarea.value = updatedTemplate;
+      setCompletedTemplate(updatedTemplate);
     }
   };
 
-  const handleAddCondition = () => {
-    setConditions((prevConditions) => [...prevConditions, nanoid()]);
+  const handleAddConditional = () => {
+    if (focusedTextarea) {
+      const { selectionStart, selectionEnd, value } = focusedTextarea;
+      const textBeforeCursor = value.substring(0, selectionStart);
+      const textAfterCursor = value.substring(selectionEnd);
+      focusedTextarea.value = textBeforeCursor;
+      setCompletedTemplate(textBeforeCursor);
+      setTextAfterCursorState(textAfterCursor);
+    }
   };
 
-  const handleDeleteCondition = (index: number) => {
-    setConditions((prevConditions) => {
-      const updatedConditions = [...prevConditions];
-      updatedConditions.splice(index, 1);
-      return updatedConditions;
-    });
+  const handleGetFull = (deepLevel: number, count: number) => {
+    const textareas = Array.from(document.getElementsByTagName('textarea')).filter(
+      (textarea) => textarea.id
+    );
+
+    const newFull = [...full];
+    newFull[deepLevel] = {
+      start:
+        textareas.find((textarea) => textarea.id === `${deepLevel}-${count}-start`)?.value || '',
+      if: textareas.find((textarea) => textarea.id === `${deepLevel}-${count}-if`)?.value || '',
+      then: textareas.find((textarea) => textarea.id === `${deepLevel}-${count}-then`)?.value || '',
+      else: textareas.find((textarea) => textarea.id === `${deepLevel}-${count}-else`)?.value || '',
+      end: textareas.find((textarea) => textarea.id === `${deepLevel}-${count}-end`)?.value || '',
+    };
+    setFull(newFull);
+  };
+  console.log(full);
+
+  const [inputs, setInputs] = useState([
+    { text: '1', focused: false, id: 1 },
+    { text: '2', focused: false, id: 2 },
+    { text: '3', focused: false, id: 3 },
+  ]);
+
+  const handleFocus = (id: number) => {
+    setInputs((prevInputs) =>
+      prevInputs.map((input) => ({
+        ...input,
+        focused: input.id === id,
+      }))
+    );
   };
 
+  const handleClick = () => {
+    const focusedIndex = inputs.findIndex((input) => input.focused);
+    if (focusedIndex >= 0) {
+      const newInput = {
+        text: '',
+        focused: true,
+        id: Date.now(), // Unique ID for the new input, you can use a library like uuid for more robust IDs
+      };
+      setInputs((prevInputs) => [
+        ...prevInputs.slice(0, focusedIndex + 1),
+        newInput,
+        ...prevInputs.slice(focusedIndex + 1),
+      ]);
+    }
+  };
+  console.log(inputs);
   return (
     <div className={styles.editor}>
       <h2 className={styles.editor__title}>Message editor</h2>
@@ -68,36 +116,35 @@ const Editor = ({
       <Button
         title="Click to add: IF [{some variable} or expression] THEN [then_value] ELSE [else_value]"
         className="button_condition"
-        onClick={handleAddCondition}
+        onClick={handleAddConditional}
       />
+      <Button title="get full" className="button_condition" onClick={() => handleGetFull(0, 0)} />
 
       <h4 className={styles.editor__subtitle}>Message template</h4>
       <div className={styles['editor__message-wrapper']}>
         <TextareaAutosize
           className={styles.editor__textarea}
-          defaultValue={completedTemplate}
-          onFocus={(event) => setFocusedTextAria(event.target)}
-          onChange={(event) => {
-            setCompletedTemplate(event.target.value);
-            onTextareaChange(0, event.target.value); // Обновляем состояние в MessageTemplateEditor
-          }}
+          defaultValue={template}
+          onFocus={(e) => setFocusedTextarea(e.target)}
+          id="0-0-start"
         />
-        {conditions.map((condition, index) => (
-          <div key={condition}>
-            <Condition
-              onDelete={() => handleDeleteCondition(index)}
-              setFocusedTextAria={setFocusedTextAria}
 
-            />
-            <TextareaAutosize
-              className={styles.editor__textarea}
-              onFocus={(event) => setFocusedTextAria(event.target)}
-              onChange={(event) => {
-                onTextareaChange(index + 1, event.target.value); // Обновляем состояние в MessageTemplateEditor
-              }}
-            />
-          </div>
+        <div id="addedConditional">
+          <Condition setFocusedTextarea={setFocusedTextarea} />
+          <TextareaAutosize
+            className={styles.editor__textarea}
+            defaultValue={textAfterCursorState}
+            onFocus={(e) => setFocusedTextarea(e.target)}
+            id="0-0-end"
+          />
+        </div>
+      </div>
+
+      <div>
+        {inputs.map((input) => (
+          <input key={input.id} value={input.text} onFocus={() => handleFocus(input.id)} />
         ))}
+        <button onClick={handleClick}>click me</button>
       </div>
     </div>
   );
