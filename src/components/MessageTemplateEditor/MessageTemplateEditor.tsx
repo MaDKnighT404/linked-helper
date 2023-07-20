@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Button } from '../Button';
 import { Editor } from './Editor';
 import { Preview } from './Preview';
-import { CompletedTemplateItem } from '../../types';
+
 import styles from './MessageTemplateEditor.module.scss';
 
 const MessageTemplateEditor = ({ onClose }: { onClose: () => void }) => {
@@ -20,9 +20,7 @@ company is {company}
 and position is {position}`;
 
   const [isOpenPreview, setIsOpenPreview] = useState(false);
-  const [completedTemplate, setCompletedTemplate] = useState<CompletedTemplateItem[]>([
-    { start: initialTemplate, if: '', then: '', else: '', end: '' },
-  ]);
+  const [completedTemplate, setCompletedTemplate] = useState();
 
   const togglePreview = () => {
     setIsOpenPreview((prev) => !prev);
@@ -33,13 +31,12 @@ and position is {position}`;
       <h1 className={styles.MessageTemplateEditor__title}>Message Template Editor</h1>
       <Editor
         variablesList={arrVarNames}
-        completedTemplate={completedTemplate}
-        setCompletedTemplate={setCompletedTemplate}
+
       />
       <Preview
         onClose={togglePreview}
         variablesList={arrVarNames}
-        template={completedTemplate[0].start as string} // need calculate result
+        template={initialTemplate} // need calculate result
         isOpen={isOpenPreview}
       />
 

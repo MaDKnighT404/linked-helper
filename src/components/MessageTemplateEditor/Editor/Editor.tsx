@@ -1,65 +1,65 @@
 import TextareaAutosize from 'react-textarea-autosize';
-import { Dispatch, useState } from 'react';
+import { ChangeEvent, useState } from 'react';
 import { nanoid } from 'nanoid';
 import { Button } from '../../Button';
-import { Condition } from './Condition';
 
 import styles from './Editor.module.scss';
-import { CompletedTemplateItem, FocusedItem } from '../../../types';
 
-const Editor = ({
-  variablesList,
-  completedTemplate,
-  setCompletedTemplate,
-}: {
-  variablesList: string[];
-  completedTemplate: CompletedTemplateItem[];
-  setCompletedTemplate: Dispatch<React.SetStateAction<CompletedTemplateItem[]>>;
-}) => {
-  const [conditions, setConditions] = useState<string[]>([]);
-  const [focusedItem, setFocusedItem] = useState<FocusedItem | null>(null);
+const a = [{text: 'start', id: nanoid(), deepLevel: 1, status: 'text' }]
 
-  const handleVariableButtonClick = (variable: string) => {};
+const Editor = ({ variablesList }: { variablesList: string[] }) => {
+  const abc = [
+    [['start', nanoid(), 'focused', 1, 'status - text']],
+    [
+      ['if', nanoid(), 'focused', 1, 'if'],
+      ['then', nanoid(), 'focused', 1, 'then'],
+      [
+        ['if', nanoid(), 'focused', 2, 'if'],
+        ['then', nanoid(), 'focused', 2, 'then'],
+        ['else', nanoid(), 'focused', 2, 'else'],
+        ['end', nanoid(), 'focused', 2, 'status - text'],
+      ],
+      ['else', nanoid(), 'focused', 1, 'else'],
+      ['end', nanoid(), 'focused', 1, 'status - text'],
+    ],
+  ];
+  const [editorStructure, setEditorStructure] = useState(abc);
+  console.log(editorStructure);
 
-  const handleAddCondition = () => {
-    setConditions((prevConditions) => [...prevConditions, nanoid()]);
-
-    // Add a new empty CompletedTemplateItem to the completedTemplate array
-    setCompletedTemplate((prevCompletedTemplate) => [
-      ...prevCompletedTemplate,
-      { if: '', then: '', else: '', end: '' },
-    ]);
-  };
-
-  const handleDeleteCondition = (index: number) => {
-    setConditions((prevConditions) => {
-      const updatedConditions = [...prevConditions];
-      updatedConditions.splice(index, 1);
-      return updatedConditions;
+  const renderTextareaElements = (elements: any[]): any[] => {
+    return elements.map((element) => {
+      if (!Array.isArray(element[0])) {
+        if (element[4] === 'status - text') {
+          return (
+            <div style={{ marginLeft: element[3] * 100 - 100 }} key={element[1]}>
+              <TextareaAutosize
+                id={element[1]}
+                className={styles.editor__textarea}
+                value={element[0]}
+              />
+            </div>
+          );
+        } else {
+          return (
+            <div
+              className={styles.condition__part}
+              style={{ marginLeft: element[3] * 100 }}
+              key={element[1]}
+            >
+              <div className={styles.condition__label}>
+                <div className={styles['condition__state-wrapper']}>
+                  <span className={styles.condition__state}>{element[4].toUpperCase()}</span>
+                  {element[4] === 'if' && <Button title="Delete" className="button_delete" />}
+                </div>
+                <TextareaAutosize className={styles.condition__textaria} />
+              </div>
+            </div>
+          );
+        }
+      } else {
+        return renderTextareaElements(element);
+      }
     });
-
-    setCompletedTemplate((prevCompletedTemplate) =>
-      prevCompletedTemplate.filter((_, i) => i !== index + 1)
-    );
-  };
-
-  const handleTextareaChange = (
-    event: React.ChangeEvent<HTMLTextAreaElement>,
-    property: keyof CompletedTemplateItem,
-    index: number
-  ) => {
-    const updatedCompletedTemplate = completedTemplate.map((item, i) =>
-      i === index ? { ...item, [property]: event.target.value } : item
-    );
-    setCompletedTemplate(updatedCompletedTemplate);
-  };
-
-  const handleTextareaFocus = (
-    event: React.FocusEvent<HTMLTextAreaElement>,
-    property: keyof CompletedTemplateItem,
-    deepLevel: number
-  ) => {
-    setFocusedItem({ focusedTextaria: event.target, deepLevel });
   };
 
   return (
@@ -71,11 +71,7 @@ const Editor = ({
       <ul className={styles['variables-list-editor']}>
         {variablesList.map((variable) => (
           <li className={styles.variable} key={variable}>
-            <Button
-              className="button_variable"
-              title={`{${variable}}`}
-              onClick={() => handleVariableButtonClick(variable)}
-            />
+            <Button className="button_variable" title={`{${variable}}`} />
           </li>
         ))}
       </ul>
@@ -83,33 +79,12 @@ const Editor = ({
       <Button
         title="Click to add: IF [{some variable} or expression] THEN [then_value] ELSE [else_value]"
         className="button_condition"
-        onClick={handleAddCondition}
       />
+      <Button title="get full" className="button_condition" />
 
       <h4 className={styles.editor__subtitle}>Message template</h4>
       <div className={styles['editor__message-wrapper']}>
-        <TextareaAutosize
-          className={styles.editor__textarea}
-          value={completedTemplate[0].start}
-          onChange={(event) => handleTextareaChange(event, 'start', 0)}
-          onFocus={(event) => handleTextareaFocus(event, 'start', 0)}
-        />
-        {conditions.map((condition, index) => (
-          <div key={condition}>
-            <Condition
-              onDelete={() => handleDeleteCondition(index)}
-              onTextareaChange={handleTextareaChange}
-              conditionData={completedTemplate[index + 1]}
-              index={index + 1}
-            />
-            <TextareaAutosize
-              className={styles.editor__textarea}
-              value={completedTemplate[index + 1].end}
-              onChange={(event) => handleTextareaChange(event, 'end', index + 1)}
-              onFocus={(event) => handleTextareaFocus(event, 'end', index + 1)}
-            />
-          </div>
-        ))}
+        {renderTextareaElements(editorStructure)}
       </div>
     </div>
   );

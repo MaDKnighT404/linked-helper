@@ -1,1 +1,1 @@
-export { default as Condition } from './Condition';
+export const asdasdas = 123;// export { default as Condition } from './Condition';
