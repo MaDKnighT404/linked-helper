@@ -5,22 +5,27 @@ import { Button } from '../../Button';
 
 import styles from './Editor.module.scss';
 
-const a = [{text: 'start', id: nanoid(), deepLevel: 1, status: 'text' }]
 
 const Editor = ({ variablesList }: { variablesList: string[] }) => {
   const abc = [
-    [['start', nanoid(), 'focused', 1, 'status - text']],
+    [{ text: 'start', id: nanoid(), focused: true, deepLevel: 1, status: 'status - text' }],
     [
-      ['if', nanoid(), 'focused', 1, 'if'],
-      ['then', nanoid(), 'focused', 1, 'then'],
+      { text: 'if', id: nanoid(), focused: true, deepLevel: 1, status: 'if' },
+      { text: 'then', id: nanoid(), focused: true, deepLevel: 1, status: 'then' },
       [
-        ['if', nanoid(), 'focused', 2, 'if'],
-        ['then', nanoid(), 'focused', 2, 'then'],
-        ['else', nanoid(), 'focused', 2, 'else'],
-        ['end', nanoid(), 'focused', 2, 'status - text'],
+        { text: 'if', id: nanoid(), focused: true, deepLevel: 2, status: 'if' },
+        { text: 'then', id: nanoid(), focused: true, deepLevel: 2, status: 'then' },
+        [
+          { text: 'if', id: nanoid(), focused: true, deepLevel: 3, status: 'if' },
+          { text: 'then', id: nanoid(), focused: true, deepLevel: 3, status: 'then' },
+          { text: 'else', id: nanoid(), focused: true, deepLevel: 3, status: 'else' },
+          { text: 'end', id: nanoid(), focused: true, deepLevel: 3, status: 'status - text' },
+        ],
+        { text: 'else', id: nanoid(), focused: true, deepLevel: 2, status: 'else' },
+        { text: 'end', id: nanoid(), focused: true, deepLevel: 2, status: 'status - text' },
       ],
-      ['else', nanoid(), 'focused', 1, 'else'],
-      ['end', nanoid(), 'focused', 1, 'status - text'],
+      { text: 'else', id: nanoid(), focused: true, deepLevel: 1, status: 'else' },
+      { text: 'end', id: nanoid(), focused: true, deepLevel: 1, status: 'status - text' },
     ],
   ];
   const [editorStructure, setEditorStructure] = useState(abc);
@@ -28,14 +33,14 @@ const Editor = ({ variablesList }: { variablesList: string[] }) => {
 
   const renderTextareaElements = (elements: any[]): any[] => {
     return elements.map((element) => {
-      if (!Array.isArray(element[0])) {
-        if (element[4] === 'status - text') {
+      if (!Array.isArray(element)) {
+        if (element.status === 'status - text') {
           return (
-            <div style={{ marginLeft: element[3] * 100 - 100 }} key={element[1]}>
+            <div style={{ marginLeft: element.deepLevel * 100 - 100 }} key={element.id}>
               <TextareaAutosize
-                id={element[1]}
+                id={element.id}
                 className={styles.editor__textarea}
-                value={element[0]}
+                value={element.text}
               />
             </div>
           );
@@ -43,13 +48,13 @@ const Editor = ({ variablesList }: { variablesList: string[] }) => {
           return (
             <div
               className={styles.condition__part}
-              style={{ marginLeft: element[3] * 100 }}
-              key={element[1]}
+              style={{ marginLeft: element.deepLevel * 100 }}
+              key={element.id}
             >
               <div className={styles.condition__label}>
                 <div className={styles['condition__state-wrapper']}>
-                  <span className={styles.condition__state}>{element[4].toUpperCase()}</span>
-                  {element[4] === 'if' && <Button title="Delete" className="button_delete" />}
+                  <span className={styles.condition__state}>{element.status.toUpperCase()}</span>
+                  {element.status === 'if' && <Button title="Delete" className="button_delete" />}
                 </div>
                 <TextareaAutosize className={styles.condition__textaria} />
               </div>
