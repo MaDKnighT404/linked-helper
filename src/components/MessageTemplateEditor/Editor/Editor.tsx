@@ -1,40 +1,76 @@
 import TextareaAutosize from 'react-textarea-autosize';
-import { ChangeEvent, useState } from 'react';
+import { useState } from 'react';
 import { nanoid } from 'nanoid';
 import { Button } from '../../Button';
 
 import styles from './Editor.module.scss';
 
-
 const Editor = ({ variablesList }: { variablesList: string[] }) => {
-  const abc = [
-    [{ text: 'start', id: nanoid(), focused: true, deepLevel: 1, status: 'status - text' }],
+  const [editorStructure, setEditorStructure] = useState([
+    [{ text: 'start', id: nanoid(), focused: true, deepLevel: 1, status: 'status - start' }],
     [
-      { text: 'if', id: nanoid(), focused: true, deepLevel: 1, status: 'if' },
-      { text: 'then', id: nanoid(), focused: true, deepLevel: 1, status: 'then' },
+      { text: 'if 1', id: nanoid(), focused: false, deepLevel: 1, status: 'if' },
+      { text: 'then 1', id: nanoid(), focused: false, deepLevel: 1, status: 'then' },
       [
-        { text: 'if', id: nanoid(), focused: true, deepLevel: 2, status: 'if' },
-        { text: 'then', id: nanoid(), focused: true, deepLevel: 2, status: 'then' },
+        { text: 'if 2', id: nanoid(), focused: false, deepLevel: 2, status: 'if' },
+        { text: 'then 2', id: nanoid(), focused: false, deepLevel: 2, status: 'then' },
         [
-          { text: 'if', id: nanoid(), focused: true, deepLevel: 3, status: 'if' },
-          { text: 'then', id: nanoid(), focused: true, deepLevel: 3, status: 'then' },
-          { text: 'else', id: nanoid(), focused: true, deepLevel: 3, status: 'else' },
-          { text: 'end', id: nanoid(), focused: true, deepLevel: 3, status: 'status - text' },
+          { text: 'if 3', id: nanoid(), focused: false, deepLevel: 3, status: 'if' },
+          { text: 'then 3', id: nanoid(), focused: false, deepLevel: 3, status: 'then' },
+          { text: 'else 3', id: nanoid(), focused: false, deepLevel: 3, status: 'else' },
+          [
+            { text: 'if 4', id: nanoid(), focused: false, deepLevel: 4, status: 'if' },
+            [
+              { text: 'if 5', id: nanoid(), focused: false, deepLevel: 5, status: 'if' },
+              { text: 'then 5', id: nanoid(), focused: false, deepLevel: 5, status: 'then' },
+              { text: 'else 5', id: nanoid(), focused: false, deepLevel: 5, status: 'else' },
+              { text: 'end 5', id: nanoid(), focused: false, deepLevel: 5, status: 'status - end' },
+            ],
+            { text: 'then 4', id: nanoid(), focused: false, deepLevel: 4, status: 'then' },
+            { text: 'else 4', id: nanoid(), focused: false, deepLevel: 4, status: 'else' },
+            { text: 'end 4', id: nanoid(), focused: false, deepLevel: 4, status: 'status - end' },
+          ],
+          { text: 'end 3', id: nanoid(), focused: false, deepLevel: 3, status: 'status - end' },
         ],
-        { text: 'else', id: nanoid(), focused: true, deepLevel: 2, status: 'else' },
-        { text: 'end', id: nanoid(), focused: true, deepLevel: 2, status: 'status - text' },
+        { text: 'else 2', id: nanoid(), focused: false, deepLevel: 2, status: 'else' },
+        { text: 'end 2', id: nanoid(), focused: false, deepLevel: 2, status: 'status - end' },
       ],
-      { text: 'else', id: nanoid(), focused: true, deepLevel: 1, status: 'else' },
-      { text: 'end', id: nanoid(), focused: true, deepLevel: 1, status: 'status - text' },
+      { text: 'else 1', id: nanoid(), focused: false, deepLevel: 1, status: 'else' },
+      { text: 'end 1', id: nanoid(), focused: false, deepLevel: 1, status: 'status - end' },
     ],
-  ];
-  const [editorStructure, setEditorStructure] = useState(abc);
+  ]);
+
+  const handleDeleteButtonClick = (deepLevel: number) => {
+    const deleteElements = (elements: any[]): any[] => {
+      const updatedElements: any[] = [];
+
+      for (const element of elements) {
+        if (Array.isArray(element)) {
+          const updatedNestedElements = deleteElements(element);
+          if (updatedNestedElements.length > 0) {
+            updatedElements.push(updatedNestedElements);
+          }
+        } else {
+          if (element.deepLevel !== deepLevel || element.status === 'status - start') {
+            updatedElements.push(element);
+          }
+        }
+      }
+
+      return updatedElements;
+    };
+
+    setEditorStructure((prevStructure) => {
+      return deleteElements(prevStructure).flat();
+    });
+  };
+
   console.log(editorStructure);
 
   const renderTextareaElements = (elements: any[]): any[] => {
     return elements.map((element) => {
       if (!Array.isArray(element)) {
-        if (element.status === 'status - text') {
+        if (element.status === 'status - start' || element.status === 'status - end') {
           return (
             <div style={{ marginLeft: element.deepLevel * 100 - 100 }} key={element.id}>
               <TextareaAutosize
@@ -54,9 +90,15 @@ const Editor = ({ variablesList }: { variablesList: string[] }) => {
               <div className={styles.condition__label}>
                 <div className={styles['condition__state-wrapper']}>
                   <span className={styles.condition__state}>{element.status.toUpperCase()}</span>
-                  {element.status === 'if' && <Button title="Delete" className="button_delete" />}
+                  {element.status === 'if' && (
+                    <Button
+                      title="Delete"
+                      className="button_delete"
+                      onClick={() => handleDeleteButtonClick(element.deepLevel)}
+                    />
+                  )}
                 </div>
-                <TextareaAutosize className={styles.condition__textaria} />
+                <TextareaAutosize className={styles.condition__textaria} value={element.text} />
               </div>
             </div>
           );

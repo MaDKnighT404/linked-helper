@@ -25,7 +25,7 @@ and position is {position}`;
   const togglePreview = () => {
     setIsOpenPreview((prev) => !prev);
   };
-  console.log(completedTemplate);
+
   return (
     <div className={styles.MessageTemplateEditor}>
       <h1 className={styles.MessageTemplateEditor__title}>Message Template Editor</h1>
