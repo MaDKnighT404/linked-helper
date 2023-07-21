@@ -1,12 +1,23 @@
+import React, { useState } from 'react';
 import TextareaAutosize from 'react-textarea-autosize';
-import { useState } from 'react';
 import { nanoid } from 'nanoid';
 import { Button } from '../../Button';
 
 import styles from './Editor.module.scss';
 
-const Editor = ({ variablesList }: { variablesList: string[] }) => {
-  const [editorStructure, setEditorStructure] = useState([
+interface Element {
+  text: string;
+  id: string;
+  focused: boolean;
+  deepLevel: number;
+  status: string;
+}
+
+type NestedElement = Element | NestedElement[];
+
+const Editor: React.FC<{ variablesList: string[] }> = ({ variablesList }) => {
+
+  const [editorStructure, setEditorStructure] = useState<NestedElement[]>([
     [{ text: 'start', id: nanoid(), focused: true, deepLevel: 1, status: 'status - start' }],
     [
       { text: 'if 1', id: nanoid(), focused: false, deepLevel: 1, status: 'if' },
@@ -40,9 +51,12 @@ const Editor = ({ variablesList }: { variablesList: string[] }) => {
     ],
   ]);
 
-  const handleDeleteButtonClick = (deepLevel: number) => {
-    const deleteElements = (elements: any[]): any[] => {
-      const updatedElements: any[] = [];
+
+
+
+  const handleDeleteButtonClick = (deepLevel: number, elements: NestedElement[]) => {
+    const deleteElements = (elements: NestedElement[]): NestedElement[] => {
+      const updatedElements: NestedElement[] = [];
 
       for (const element of elements) {
         if (Array.isArray(element)) {
@@ -61,51 +75,63 @@ const Editor = ({ variablesList }: { variablesList: string[] }) => {
     };
 
     setEditorStructure((prevStructure) => {
-      return deleteElements(prevStructure).flat();
+      const updatedStructure = deleteElements(elements).flat();
+      return updateDeepLevel(updatedStructure, 1);
     });
   };
 
-  console.log(editorStructure);
+  const updateDeepLevel = (elements: NestedElement[], currentDeepLevel: number): NestedElement[] => {
+    const updatedElements: NestedElement[] = [];
 
-  const renderTextareaElements = (elements: any[]): any[] => {
-    return elements.map((element) => {
-      if (!Array.isArray(element)) {
-        if (element.status === 'status - start' || element.status === 'status - end') {
-          return (
-            <div style={{ marginLeft: element.deepLevel * 100 - 100 }} key={element.id}>
-              <TextareaAutosize
-                id={element.id}
-                className={styles.editor__textarea}
-                value={element.text}
-              />
-            </div>
-          );
-        } else {
-          return (
-            <div
-              className={styles.condition__part}
-              style={{ marginLeft: element.deepLevel * 100 }}
-              key={element.id}
-            >
-              <div className={styles.condition__label}>
-                <div className={styles['condition__state-wrapper']}>
-                  <span className={styles.condition__state}>{element.status.toUpperCase()}</span>
-                  {element.status === 'if' && (
-                    <Button
-                      title="Delete"
-                      className="button_delete"
-                      onClick={() => handleDeleteButtonClick(element.deepLevel)}
-                    />
-                  )}
-                </div>
-                <TextareaAutosize className={styles.condition__textaria} value={element.text} />
-              </div>
-            </div>
-          );
-        }
+    for (const element of elements) {
+      if (Array.isArray(element)) {
+        const updatedNestedElements = updateDeepLevel(element, currentDeepLevel + 1);
+        updatedElements.push(updatedNestedElements);
       } else {
-        return renderTextareaElements(element);
+        element.deepLevel = currentDeepLevel;
+        updatedElements.push(element);
       }
+    }
+
+    return updatedElements;
+  };
+
+  const renderTextareaElements = (elements: NestedElement[]): JSX.Element[] => {
+    return elements.map((element) => {
+      if (Array.isArray(element)) {
+        return (
+          <React.Fragment key={(element as Element[])[0].id}>
+            {renderTextareaElements(element)}
+          </React.Fragment>
+        );
+      }
+
+      const elementData = element as Element;
+
+      return (
+        <div
+          className={styles.condition__part}
+          style={{ marginLeft: elementData.deepLevel * 100 }}
+          key={elementData.id}
+        >
+          <div className={styles.condition__label}>
+            <div className={styles['condition__state-wrapper']}>
+              <span className={styles.condition__state}>{elementData.status.toUpperCase()}</span>
+              {elementData.status === 'if' && (
+                <Button
+                  title="Delete"
+                  className="button_delete"
+                  onClick={() => handleDeleteButtonClick(elementData.deepLevel, editorStructure)}
+                />
+              )}
+            </div>
+            <TextareaAutosize
+              className={styles.condition__textaria}
+              value={elementData.text}
+            />
+          </div>
+        </div>
+      );
     });
   };
 
