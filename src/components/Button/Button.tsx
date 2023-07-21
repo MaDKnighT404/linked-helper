@@ -5,10 +5,12 @@ const Button = ({
   title,
   className,
   onClick,
+
 }: {
   title: string;
   className?: string;
   onClick?: () => void;
+
 }) => {
   const buttonClasses = classNames(styles.button, className && styles[className]);
 

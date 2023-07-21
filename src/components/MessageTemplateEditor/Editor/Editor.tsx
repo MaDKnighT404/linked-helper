@@ -10,128 +10,159 @@ interface Element {
   id: string;
   focused: boolean;
   deepLevel: number;
+  count: number;
   status: string;
 }
 
 type NestedElement = Element | NestedElement[];
 
-const Editor: React.FC<{ variablesList: string[] }> = ({ variablesList }) => {
+const recursiveDeleteByDeepLevel = (
+  elements: NestedElement[],
+  targetDeepLevel: number,
+  targetCount: number
+): NestedElement[] => {
+  return elements.reduce((acc: NestedElement[], element: NestedElement) => {
+    if (Array.isArray(element)) {
+      const newNestedArray = recursiveDeleteByDeepLevel(element, targetDeepLevel, targetCount);
+      if (newNestedArray.length > 0) {
+        acc.push(newNestedArray);
+      }
+    } else {
+      const elementData = element as Element;
+      if (elementData.deepLevel !== targetDeepLevel || elementData.count !== targetCount || elementData.status === 'status - start') {
+        acc.push(elementData);
+      }
+    }
+    return acc;
+  }, []);
+};
 
+const Editor: React.FC<{ variablesList: string[] }> = ({ variablesList }) => {
   const [editorStructure, setEditorStructure] = useState<NestedElement[]>([
-    [{ text: 'start', id: nanoid(), focused: true, deepLevel: 1, status: 'status - start' }],
     [
-      { text: 'if 1', id: nanoid(), focused: false, deepLevel: 1, status: 'if' },
-      { text: 'then 1', id: nanoid(), focused: false, deepLevel: 1, status: 'then' },
+      {
+        text: 'start',
+        id: nanoid(),
+        focused: true,
+        deepLevel: 1,
+        count: 1,
+        status: 'status - start',
+      },
+    ],
+    [
+      { text: 'if 1', id: nanoid(), focused: false, deepLevel: 1, count: 1, status: 'if' },
       [
-        { text: 'if 2', id: nanoid(), focused: false, deepLevel: 2, status: 'if' },
-        { text: 'then 2', id: nanoid(), focused: false, deepLevel: 2, status: 'then' },
-        [
-          { text: 'if 3', id: nanoid(), focused: false, deepLevel: 3, status: 'if' },
-          { text: 'then 3', id: nanoid(), focused: false, deepLevel: 3, status: 'then' },
-          { text: 'else 3', id: nanoid(), focused: false, deepLevel: 3, status: 'else' },
-          [
-            { text: 'if 4', id: nanoid(), focused: false, deepLevel: 4, status: 'if' },
-            [
-              { text: 'if 5', id: nanoid(), focused: false, deepLevel: 5, status: 'if' },
-              { text: 'then 5', id: nanoid(), focused: false, deepLevel: 5, status: 'then' },
-              { text: 'else 5', id: nanoid(), focused: false, deepLevel: 5, status: 'else' },
-              { text: 'end 5', id: nanoid(), focused: false, deepLevel: 5, status: 'status - end' },
-            ],
-            { text: 'then 4', id: nanoid(), focused: false, deepLevel: 4, status: 'then' },
-            { text: 'else 4', id: nanoid(), focused: false, deepLevel: 4, status: 'else' },
-            { text: 'end 4', id: nanoid(), focused: false, deepLevel: 4, status: 'status - end' },
-          ],
-          { text: 'end 3', id: nanoid(), focused: false, deepLevel: 3, status: 'status - end' },
-        ],
-        { text: 'else 2', id: nanoid(), focused: false, deepLevel: 2, status: 'else' },
-        { text: 'end 2', id: nanoid(), focused: false, deepLevel: 2, status: 'status - end' },
+        { text: 'if 2', id: nanoid(), focused: false, deepLevel: 2, count: 1, status: 'if' },
+        { text: 'then 2', id: nanoid(), focused: false, deepLevel: 2, count: 1, status: 'then' },
+        { text: 'else 2', id: nanoid(), focused: false, deepLevel: 2, count: 1, status: 'else' },
+        {
+          text: 'end 2',
+          id: nanoid(),
+          focused: false,
+          deepLevel: 2,
+          count: 1,
+          status: 'status - end',
+        },
       ],
-      { text: 'else 1', id: nanoid(), focused: false, deepLevel: 1, status: 'else' },
-      { text: 'end 1', id: nanoid(), focused: false, deepLevel: 1, status: 'status - end' },
+      { text: 'then 1', id: nanoid(), focused: false, deepLevel: 1, count: 1, status: 'then' },
+      [
+        { text: 'if 3', id: nanoid(), focused: false, deepLevel: 2, count: 2, status: 'if' },
+        [
+          { text: 'if 4', id: nanoid(), focused: false, deepLevel: 3, count: 1, status: 'if' },
+          { text: 'then 4', id: nanoid(), focused: false, deepLevel: 3, count: 1, status: 'then' },
+          { text: 'else 4', id: nanoid(), focused: false, deepLevel: 3, count: 1, status: 'else' },
+          {
+            text: 'end 4',
+            id: nanoid(),
+            focused: false,
+            deepLevel: 3,
+            count: 1,
+            status: 'status - end',
+          },
+        ],
+        { text: 'then 3', id: nanoid(), focused: false, deepLevel: 2, count: 2, status: 'then' },
+        [
+          { text: 'if 5', id: nanoid(), focused: false, deepLevel: 3, count: 2, status: 'if' },
+          { text: 'then 5', id: nanoid(), focused: false, deepLevel: 3, count: 2, status: 'then' },
+          { text: 'else 5', id: nanoid(), focused: false, deepLevel: 3, count: 2, status: 'else' },
+          {
+            text: 'end ',
+            id: nanoid(),
+            focused: false,
+            deepLevel: 3,
+            count: 2,
+            status: 'status - end',
+          },
+        ],
+        { text: 'else 3', id: nanoid(), focused: false, deepLevel: 2, count: 2, status: 'else' },
+        {
+          text: 'end 3',
+          id: nanoid(),
+          focused: false,
+          deepLevel: 2,
+          count: 2,
+          status: 'status - end',
+        },
+      ],
+      { text: 'else 1', id: nanoid(), focused: false, deepLevel: 1, count: 1, status: 'else' },
+      {
+        text: 'end 1',
+        id: nanoid(),
+        focused: false,
+        deepLevel: 1,
+        count: 1,
+        status: 'status - end',
+      },
     ],
   ]);
 
-
-
-
-  const handleDeleteButtonClick = (deepLevel: number, elements: NestedElement[]) => {
-    const deleteElements = (elements: NestedElement[]): NestedElement[] => {
-      const updatedElements: NestedElement[] = [];
-
-      for (const element of elements) {
-        if (Array.isArray(element)) {
-          const updatedNestedElements = deleteElements(element);
-          if (updatedNestedElements.length > 0) {
-            updatedElements.push(updatedNestedElements);
-          }
-        } else {
-          if (element.deepLevel !== deepLevel || element.status === 'status - start') {
-            updatedElements.push(element);
-          }
-        }
-      }
-
-      return updatedElements;
-    };
-
-    setEditorStructure((prevStructure) => {
-      const updatedStructure = deleteElements(elements).flat();
-      return updateDeepLevel(updatedStructure, 1);
-    });
-  };
-
-  const updateDeepLevel = (elements: NestedElement[], currentDeepLevel: number): NestedElement[] => {
-    const updatedElements: NestedElement[] = [];
-
-    for (const element of elements) {
-      if (Array.isArray(element)) {
-        const updatedNestedElements = updateDeepLevel(element, currentDeepLevel + 1);
-        updatedElements.push(updatedNestedElements);
-      } else {
-        element.deepLevel = currentDeepLevel;
-        updatedElements.push(element);
-      }
-    }
-
-    return updatedElements;
+  const handleDeleteButtonClick = (deepLevel: number, count: number) => {
+    const newEditorStructure = recursiveDeleteByDeepLevel(editorStructure, deepLevel, count);
+    setEditorStructure(newEditorStructure);
   };
 
   const renderTextareaElements = (elements: NestedElement[]): JSX.Element[] => {
     return elements.map((element) => {
       if (Array.isArray(element)) {
-        return (
-          <React.Fragment key={(element as Element[])[0].id}>
-            {renderTextareaElements(element)}
-          </React.Fragment>
-        );
+        return <React.Fragment key={nanoid()}>{renderTextareaElements(element)}</React.Fragment>;
       }
 
       const elementData = element as Element;
-
-      return (
-        <div
-          className={styles.condition__part}
-          style={{ marginLeft: elementData.deepLevel * 100 }}
-          key={elementData.id}
-        >
-          <div className={styles.condition__label}>
-            <div className={styles['condition__state-wrapper']}>
-              <span className={styles.condition__state}>{elementData.status.toUpperCase()}</span>
-              {elementData.status === 'if' && (
-                <Button
-                  title="Delete"
-                  className="button_delete"
-                  onClick={() => handleDeleteButtonClick(elementData.deepLevel, editorStructure)}
-                />
-              )}
-            </div>
+      if (element.status === 'status - start' || element.status === 'status - end') {
+        return (
+          <div style={{ marginLeft: element.deepLevel * 100 - 100 }} key={element.id}>
             <TextareaAutosize
-              className={styles.condition__textaria}
-              value={elementData.text}
+              id={element.id}
+              className={styles.editor__textarea}
+              value={element.text}
             />
           </div>
-        </div>
-      );
+        );
+      } else {
+        return (
+          <div
+            className={styles.condition__part}
+            style={{ marginLeft: elementData.deepLevel * 100 }}
+            key={elementData.id}
+          >
+            <div className={styles.condition__label}>
+              <div className={styles['condition__state-wrapper']}>
+                <span className={styles.condition__state}>{elementData.status.toUpperCase()}</span>
+                {elementData.status === 'if' && (
+                  <Button
+                    title="Delete"
+                    className="button_delete"
+                    onClick={() =>
+                      handleDeleteButtonClick(elementData.deepLevel, elementData.count)
+                    }
+                  />
+                )}
+              </div>
+              <TextareaAutosize className={styles.condition__textaria} value={elementData.text} />
+            </div>
+          </div>
+        );
+      }
     });
   };
 
