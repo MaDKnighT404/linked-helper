@@ -44,19 +44,13 @@ export const insertBlockAfterFocused = (elements: NestedElement[], newBlock: Ele
   }, []);
 };
 
-export function messageGenerator(template: string, values: Record<string, string>): string {
-  const regex = /\{([^}]+)\}/g;
-
-  const generatedMessage = template.replace(regex, (_, variable: string) => values[variable] || '');
-
-  return generatedMessage;
-}
-
 export const recursiveAdjustment = (elements: NestedElement[], targetDeepLevel: number, targetCount: number, decrementLevelFrom: number): NestedElement[] => {
   return elements.reduce((acc: NestedElement[], element: NestedElement) => {
     if (Array.isArray(element)) {
       const newNestedArray = recursiveAdjustment(element, targetDeepLevel, targetCount, decrementLevelFrom);
-      acc.push(newNestedArray);
+      if (newNestedArray.length > 0) {
+        acc.push(newNestedArray);
+      }
     } else {
       const elementData = element as Element;
       if (!(elementData.deepLevel === targetDeepLevel && elementData.count === targetCount && elementData.status !== 'start')) {

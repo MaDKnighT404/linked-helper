@@ -3,18 +3,21 @@ import TextareaAutosize from 'react-textarea-autosize';
 import useEditorHooks from '../../../Hooks/useEditorHooks';
 import { Button } from '../../Button';
 import { Element, NestedElement } from '../../../types';
-import { concatenateTexts } from '../../../helpers';
+
 import styles from './Editor.module.scss';
 
-const Editor = ({ variablesList, setCompletedTemplate, setSavedTemplate }: { variablesList: string[]; setCompletedTemplate: (value: string) => void; setSavedTemplate: (value: any) => void }) => {
+const Editor = ({
+  variablesList,
+  setSavedTemplateStructure,
+}: {
+  variablesList: string[];
+  setSavedTemplateStructure: (value: NestedElement[]) => void;
+}) => {
   const { editorStructure, handleSetFocus, handleDeleteButtonClick, handleTextareaChange, handleVariableButtonClick, handleCursorPositionChange, handleAddNewBlock } = useEditorHooks();
 
   useEffect(() => {
-    const newPreviewText = concatenateTexts(editorStructure);
-    const savedTemplate = editorStructure;
-    setSavedTemplate(savedTemplate);
-    setCompletedTemplate(newPreviewText);
-  }, [editorStructure, setCompletedTemplate, setSavedTemplate]);
+    setSavedTemplateStructure(editorStructure);
+  }, [editorStructure, setSavedTemplateStructure]);
 
   const renderTextareaElements = (elements: NestedElement[]): JSX.Element[] => {
     return elements.map((element, index) => {
@@ -39,7 +42,7 @@ const Editor = ({ variablesList, setCompletedTemplate, setSavedTemplate }: { var
         );
       } else {
         return (
-          <div className={styles.condition__part} style={{ marginLeft: elementData.deepLevel * 100 }} key={elementData.id}>
+          <div className={styles.condition__part} style={{ marginLeft: elementData.deepLevel * 100 - 100 }} key={elementData.id}>
             <div className={styles.condition__label}>
               <div className={styles['condition__state-wrapper']}>
                 <span className={styles.condition__state}>{elementData.status.toUpperCase()}</span>
