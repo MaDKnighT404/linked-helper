@@ -6,7 +6,7 @@ import { Element, NestedElement } from '../../../types';
 import styles from './Editor.module.scss';
 
 const Editor = ({ variablesList }: { variablesList: string[] }) => {
-  const { editorStructure, handleSetFocus, handleDeleteButtonClick, handleTextareaChange, handleVariableButtonClick, handleCursorPositionChange } = useEditorHooks();
+  const { editorStructure, handleSetFocus, handleDeleteButtonClick, handleTextareaChange, handleVariableButtonClick, handleCursorPositionChange, handleAddNewBlock } = useEditorHooks();
 
   const renderTextareaElements = (elements: NestedElement[]): JSX.Element[] => {
     return elements.map((element, index) => {
@@ -15,11 +15,11 @@ const Editor = ({ variablesList }: { variablesList: string[] }) => {
       }
 
       const elementData = element as Element;
-      if (element.status === 'status - start' || element.status === 'status - end') {
+      if (element.status === 'start' || element.status === 'end') {
         return (
           <div style={{ marginLeft: element.deepLevel * 100 - 100 }} key={element.id}>
             <TextareaAutosize
-              id={element.id}
+              id={`(${element.deepLevel})(${element.count})(${element.status})|${element.id}`}
               className={styles.editor__textarea}
               value={element.text}
               onFocus={(e) => handleSetFocus(e.target)}
@@ -38,7 +38,7 @@ const Editor = ({ variablesList }: { variablesList: string[] }) => {
                 {elementData.status === 'if' && <Button title="Delete" className="button_delete" onClick={() => handleDeleteButtonClick(elementData.deepLevel, elementData.count)} />}
               </div>
               <TextareaAutosize
-                id={element.id}
+                id={`(${element.deepLevel})(${element.count})(${element.status})|${element.id}`}
                 className={styles.condition__textaria}
                 value={elementData.text}
                 onFocus={(e) => handleSetFocus(e.target)}
@@ -67,7 +67,7 @@ const Editor = ({ variablesList }: { variablesList: string[] }) => {
         ))}
       </ul>
 
-      <Button title="Click to add: IF [{some variable} or expression] THEN [then_value] ELSE [else_value]" className="button_condition" />
+      <Button title="Click to add: IF [{some variable} or expression] THEN [then_value] ELSE [else_value]" className="button_condition" onClick={handleAddNewBlock} />
       <Button title="get full" className="button_condition" />
 
       <h4 className={styles.editor__subtitle}>Message template</h4>

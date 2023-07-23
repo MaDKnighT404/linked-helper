@@ -9,7 +9,7 @@ const recursiveAdjustment = (elements: NestedElement[], targetDeepLevel: number,
       acc.push(newNestedArray);
     } else {
       const elementData = element as Element;
-      if (!(elementData.deepLevel === targetDeepLevel && elementData.count === targetCount && elementData.status !== 'status - start')) {
+      if (!(elementData.deepLevel === targetDeepLevel && elementData.count === targetCount && elementData.status !== 'start')) {
         if (elementData.deepLevel > decrementLevelFrom) {
           elementData.deepLevel -= 1;
         }
@@ -23,39 +23,7 @@ const recursiveAdjustment = (elements: NestedElement[], targetDeepLevel: number,
 const useEditorHooks = () => {
   const [focusedElementId, setFocusedElementId] = useState<string | null>(null);
   const [cursorPosition, setCursorPosition] = useState<number>(0);
-  const [editorStructure, setEditorStructure] = useState<NestedElement[]>([
-    [{ text: 'start', id: nanoid(), deepLevel: 1, count: 1, status: 'status - start' }],
-    [
-      { text: 'if 1-1', id: nanoid(), deepLevel: 1, count: 1, status: 'if' },
-      { text: 'then 1-1', id: nanoid(), deepLevel: 1, count: 1, status: 'then' },
-      [
-        { text: 'if 2-1', id: nanoid(), deepLevel: 2, count: 1, status: 'if' },
-        { text: 'then 2-1', id: nanoid(), deepLevel: 2, count: 1, status: 'then' },
-        [
-          { text: 'if 3-1', id: nanoid(), deepLevel: 3, count: 1, status: 'if' },
-          { text: 'then 3-1', id: nanoid(), deepLevel: 3, count: 1, status: 'then' },
-          [
-            { text: 'if 4-1', id: nanoid(), deepLevel: 4, count: 1, status: 'if' },
-            { text: 'then 4-1', id: nanoid(), deepLevel: 4, count: 1, status: 'then' },
-            { text: 'else 4-1', id: nanoid(), deepLevel: 4, count: 1, status: 'else' },
-            { text: 'end 4-1', id: nanoid(), deepLevel: 4, count: 1, status: 'status - end' },
-          ],
-          { text: 'else 3-1', id: nanoid(), deepLevel: 3, count: 1, status: 'else' },
-          { text: 'end 3-1', id: nanoid(), deepLevel: 3, count: 1, status: 'status - end' },
-        ],
-        { text: 'else 2-1', id: nanoid(), deepLevel: 2, count: 1, status: 'else' },
-        { text: 'end 2-1', id: nanoid(), deepLevel: 2, count: 1, status: 'status - end' },
-      ],
-      { text: 'else 1-1', id: nanoid(), deepLevel: 1, count: 1, status: 'else' },
-      [
-        { text: 'if 2-2', id: nanoid(), deepLevel: 2, count: 2, status: 'if' },
-        { text: 'then 2-2', id: nanoid(), deepLevel: 2, count: 2, status: 'then' },
-        { text: 'else 2-2', id: nanoid(), deepLevel: 2, count: 2, status: 'else' },
-        { text: 'end 2-2', id: nanoid(), deepLevel: 2, count: 2, status: 'status - end' },
-      ],
-      { text: 'end 1-1', id: nanoid(), deepLevel: 1, count: 1, status: 'status - end' },
-    ],
-  ]);
+  const [editorStructure, setEditorStructure] = useState<NestedElement[]>([[{ text: 'start', id: nanoid(), deepLevel: 1, count: 1, status: 'start' }]]);
 
   const handleSetFocus = (e: HTMLTextAreaElement) => {
     setFocusedElementId(e.id);
@@ -67,13 +35,15 @@ const useEditorHooks = () => {
   };
 
   const handleTextareaChange = (id: string, value: string) => {
+    if (!focusedElementId) return;
+    const rawId = focusedElementId.split('|')[1];
     const updateTextInNestedArray = (elements: NestedElement[]): NestedElement[] => {
       return elements.map((element) => {
         if (Array.isArray(element)) {
           return updateTextInNestedArray(element);
         } else {
           const elementData = element as Element;
-          if (elementData.id === id) {
+          if (elementData.id === rawId) {
             return { ...elementData, text: value };
           }
           return elementData;
@@ -87,13 +57,15 @@ const useEditorHooks = () => {
 
   const handleVariableButtonClick = (variableText: string) => {
     if (!focusedElementId) return;
+    const rawId = focusedElementId.split('|')[1];
+
     const updateTextInNestedArray = (elements: NestedElement[]): NestedElement[] => {
       return elements.map((element) => {
         if (Array.isArray(element)) {
           return updateTextInNestedArray(element);
         } else {
           const elementData = element as Element;
-          if (elementData.id === focusedElementId) {
+          if (elementData.id === rawId) {
             const newText = [elementData.text.slice(0, cursorPosition), variableText, elementData.text.slice(cursorPosition)].join('');
             return { ...elementData, text: newText };
           }
@@ -101,13 +73,85 @@ const useEditorHooks = () => {
         }
       });
     };
-    setCursorPosition(0);
+    setFocusedElementId(null);
     const newEditorStructure = updateTextInNestedArray(editorStructure);
     setEditorStructure(newEditorStructure);
   };
 
   const handleCursorPositionChange = (position: number) => {
     setCursorPosition(position);
+  };
+
+  const handleAddNewBlock = () => {
+    if (!focusedElementId || cursorPosition === null) return;
+
+    const infoSection = focusedElementId.split('|')[0];
+    const rawId = focusedElementId.split('|')[1];
+
+    const cleanedInfo = infoSection.substring(1, infoSection.length - 1);
+    const [deepLevelStr, countStr, status] = cleanedInfo.split(')(');
+
+    let currentDeepLevel = parseInt(deepLevelStr);
+    const currentCount = parseInt(countStr);
+
+    if (status !== 'start') {
+      currentDeepLevel += 1;
+    }
+
+    const newBlockCount = currentCount + 1;
+
+    let focusedElementText = '';
+
+    const updateFocusedElementText = (elements: NestedElement[]): NestedElement[] => {
+      return elements.map((element) => {
+        if (Array.isArray(element)) {
+          return updateFocusedElementText(element);
+        } else {
+          const elementData = element as Element;
+          if (elementData.id === rawId) {
+            focusedElementText = elementData.text;
+            return { ...elementData, text: elementData.text.slice(0, cursorPosition) };
+          }
+          return elementData;
+        }
+      });
+    };
+
+    const editorStructureWithUpdatedText = updateFocusedElementText(editorStructure);
+
+    const newBlock = [
+      { text: `if ${currentDeepLevel}-${newBlockCount}`, id: nanoid(), deepLevel: currentDeepLevel, count: newBlockCount, status: 'if' },
+      { text: `then ${currentDeepLevel}-${newBlockCount}`, id: nanoid(), deepLevel: currentDeepLevel, count: newBlockCount, status: 'then' },
+      { text: `else ${currentDeepLevel}-${newBlockCount}`, id: nanoid(), deepLevel: currentDeepLevel, count: newBlockCount, status: 'else' },
+      { text: focusedElementText.slice(cursorPosition), id: nanoid(), deepLevel: currentDeepLevel, count: newBlockCount, status: 'end' },
+    ];
+
+    const insertBlockAfterFocused = (elements: NestedElement[]): NestedElement[] => {
+      let insert = false;
+
+      return elements.reduce((acc: NestedElement[], element: NestedElement) => {
+        if (Array.isArray(element)) {
+          acc.push(insertBlockAfterFocused(element));
+        } else {
+          const elementData = element as Element;
+          acc.push(elementData);
+          if (elementData.id === rawId) {
+            insert = true;
+          }
+        }
+
+        if (insert) {
+          acc.push(newBlock);
+          insert = false;
+        }
+
+        return acc;
+      }, []);
+    };
+
+    const newEditorStructure = insertBlockAfterFocused(editorStructureWithUpdatedText);
+    setFocusedElementId(null);
+    setEditorStructure(newEditorStructure);
   };
 
   return {
@@ -118,7 +162,8 @@ const useEditorHooks = () => {
     handleDeleteButtonClick,
     handleTextareaChange,
     handleVariableButtonClick,
-    handleCursorPositionChange
+    handleCursorPositionChange,
+    handleAddNewBlock,
   };
 };
 
