@@ -1,12 +1,18 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import TextareaAutosize from 'react-textarea-autosize';
 import useEditorHooks from '../../../Hooks/useEditorHooks';
 import { Button } from '../../Button';
 import { Element, NestedElement } from '../../../types';
+import { concatenateTexts } from '../../../helpers';
 import styles from './Editor.module.scss';
 
-const Editor = ({ variablesList }: { variablesList: string[] }) => {
+const Editor = ({ variablesList, setCompletedTemplate }: { variablesList: string[]; setCompletedTemplate: (value: string) => void }) => {
   const { editorStructure, handleSetFocus, handleDeleteButtonClick, handleTextareaChange, handleVariableButtonClick, handleCursorPositionChange, handleAddNewBlock } = useEditorHooks();
+
+  useEffect(() => {
+    const newPreviewText = concatenateTexts(editorStructure);
+    setCompletedTemplate(newPreviewText);
+  }, [editorStructure, setCompletedTemplate]);
 
   const renderTextareaElements = (elements: NestedElement[]): JSX.Element[] => {
     return elements.map((element, index) => {
@@ -23,7 +29,7 @@ const Editor = ({ variablesList }: { variablesList: string[] }) => {
               className={styles.editor__textarea}
               value={element.text}
               onFocus={(e) => handleSetFocus(e.target)}
-              onChange={(e) => handleTextareaChange(e.target.id, e.target.value)}
+              onChange={(e) => handleTextareaChange(e.target.value)}
               onClick={(e) => handleCursorPositionChange(e.currentTarget.selectionStart)}
               onKeyUp={(e) => handleCursorPositionChange(e.currentTarget.selectionStart)}
             />
@@ -42,7 +48,7 @@ const Editor = ({ variablesList }: { variablesList: string[] }) => {
                 className={styles.condition__textaria}
                 value={elementData.text}
                 onFocus={(e) => handleSetFocus(e.target)}
-                onChange={(e) => handleTextareaChange(e.target.id, e.target.value)}
+                onChange={(e) => handleTextareaChange(e.target.value)}
                 onClick={(e) => handleCursorPositionChange(e.currentTarget.selectionStart)}
                 onKeyUp={(e) => handleCursorPositionChange(e.currentTarget.selectionStart)}
               />

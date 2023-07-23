@@ -8,8 +8,8 @@ const useEditorHooks = () => {
   const [cursorPosition, setCursorPosition] = useState<number>(0);
   const [editorStructure, setEditorStructure] = useState<NestedElement[]>([[{ text: 'start', id: nanoid(), deepLevel: 1, count: 1, status: 'start' }]]);
 
-  const handleSetFocus = (e: HTMLTextAreaElement) => {
-    setFocusedElementId(e.id);
+  const handleSetFocus = (element: HTMLTextAreaElement) => {
+    setFocusedElementId(element.id);
   };
 
   const handleDeleteButtonClick = (deepLevel: number, count: number) => {
@@ -17,7 +17,7 @@ const useEditorHooks = () => {
     setEditorStructure(newEditorStructure);
   };
 
-  const handleTextareaChange = (id: string, value: string) => {
+  const handleTextareaChange = (value: string) => {
     if (!focusedElementId) return;
     const rawId = focusedElementId.split('|')[1];
     const updateTextInNestedArray = (elements: NestedElement[]): NestedElement[] => {
