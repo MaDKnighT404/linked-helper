@@ -1,12 +1,16 @@
 import { useState } from 'react';
 import { nanoid } from 'nanoid';
 import { Element, NestedElement } from '../types';
-import { insertBlockAfterFocused, recursiveAdjustment, updateFocusedElementText } from '../helpers';
+import { insertBlockAfterFocused, recursiveAdjustment } from '../helpers';
 
 const useEditorHooks = () => {
+  const initialEditorStructure = localStorage.getItem('editorTemplate') 
+  ? JSON.parse(localStorage.getItem('editorTemplate')!) 
+  : [[{ text: 'Hello! You can added here any message!', id: nanoid(), deepLevel: 1, count: 1, status: 'start' }]];
+
   const [focusedElementId, setFocusedElementId] = useState<string | null>(null);
   const [cursorPosition, setCursorPosition] = useState<number>(0);
-  const [editorStructure, setEditorStructure] = useState<NestedElement[]>([[{ text: 'start', id: nanoid(), deepLevel: 1, count: 1, status: 'start' }]]);
+  const [editorStructure, setEditorStructure] = useState<NestedElement[]>(initialEditorStructure);
   const [deepLevelCounts, setDeepLevelCounts] = useState<{ [key: number]: number }>({ 1: 1 });
 
   const handleSetFocus = (element: HTMLTextAreaElement) => {
@@ -73,8 +77,8 @@ const useEditorHooks = () => {
     const rawId = focusedElementId.split('|')[1];
 
     const cleanedInfo = infoSection.substring(1, infoSection.length - 1);
-    const [deepLevelStr, count, status] = cleanedInfo.split(')(');
-    console.log(status);
+    const [deepLevelStr, status] = cleanedInfo.split(')(');
+
     let currentDeepLevel = parseInt(deepLevelStr);
 
     if (status !== 'start') {
@@ -84,7 +88,25 @@ const useEditorHooks = () => {
     const newBlockCount = (deepLevelCounts[currentDeepLevel] || 0) + 1;
     setDeepLevelCounts({ ...deepLevelCounts, [currentDeepLevel]: newBlockCount });
 
-    const [editorStructureWithUpdatedText, focusedElementText] = updateFocusedElementText(editorStructure, rawId, cursorPosition);
+    let focusedElementText = '';
+
+    const updateFocusedElementText = (elements: NestedElement[]): NestedElement[] => {
+      return elements.map((element) => {
+        if (Array.isArray(element)) {
+          return updateFocusedElementText(element);
+        } else {
+          const elementData = element as Element;
+          if (elementData.id === rawId) {
+            focusedElementText = elementData.text;
+            const textBeforeCursorSplit = elementData.text.slice(0, cursorPosition);
+            return { ...elementData, text: textBeforeCursorSplit };
+          }
+          return elementData;
+        }
+      });
+    };
+
+    const editorStructureWithUpdatedText = updateFocusedElementText(editorStructure);
     const textAfterCursorSplit = focusedElementText.slice(cursorPosition);
 
     const newBlock = [

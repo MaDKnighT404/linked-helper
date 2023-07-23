@@ -6,13 +6,15 @@ import { Element, NestedElement } from '../../../types';
 import { concatenateTexts } from '../../../helpers';
 import styles from './Editor.module.scss';
 
-const Editor = ({ variablesList, setCompletedTemplate }: { variablesList: string[]; setCompletedTemplate: (value: string) => void }) => {
+const Editor = ({ variablesList, setCompletedTemplate, setSavedTemplate }: { variablesList: string[]; setCompletedTemplate: (value: string) => void; setSavedTemplate: (value: any) => void }) => {
   const { editorStructure, handleSetFocus, handleDeleteButtonClick, handleTextareaChange, handleVariableButtonClick, handleCursorPositionChange, handleAddNewBlock } = useEditorHooks();
 
   useEffect(() => {
     const newPreviewText = concatenateTexts(editorStructure);
+    const savedTemplate = editorStructure;
+    setSavedTemplate(savedTemplate);
     setCompletedTemplate(newPreviewText);
-  }, [editorStructure, setCompletedTemplate]);
+  }, [editorStructure, setCompletedTemplate, setSavedTemplate]);
 
   const renderTextareaElements = (elements: NestedElement[]): JSX.Element[] => {
     return elements.map((element, index) => {
@@ -25,7 +27,7 @@ const Editor = ({ variablesList, setCompletedTemplate }: { variablesList: string
         return (
           <div style={{ marginLeft: element.deepLevel * 100 - 100 }} key={element.id}>
             <TextareaAutosize
-              id={`(${element.deepLevel})(${element.count})(${element.status})|${element.id}`}
+              id={`(${element.deepLevel})(${element.status})|${element.id}`}
               className={styles.editor__textarea}
               value={element.text}
               onFocus={(e) => handleSetFocus(e.target)}
@@ -44,7 +46,7 @@ const Editor = ({ variablesList, setCompletedTemplate }: { variablesList: string
                 {elementData.status === 'if' && <Button title="Delete" className="button_delete" onClick={() => handleDeleteButtonClick(elementData.deepLevel, elementData.count)} />}
               </div>
               <TextareaAutosize
-                id={`(${element.deepLevel})(${element.count})(${element.status})|${element.id}`}
+                id={`(${element.deepLevel})(${element.status})|${element.id}`}
                 className={styles.condition__textaria}
                 value={elementData.text}
                 onFocus={(e) => handleSetFocus(e.target)}

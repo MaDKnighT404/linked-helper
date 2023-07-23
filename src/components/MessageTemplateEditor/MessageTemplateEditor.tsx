@@ -10,15 +10,20 @@ const MessageTemplateEditor = ({ onClose }: { onClose: () => void }) => {
 
   const [isOpenPreview, setIsOpenPreview] = useState(false);
   const [completedTemplate, setCompletedTemplate] = useState('');
+  const [savedTemplate, setSavedTemplate] = useState<any>();
 
   const togglePreview = () => {
     setIsOpenPreview((prev) => !prev);
   };
 
+  const saveEditorTemplate = () => {
+    localStorage.setItem('editorTemplate', JSON.stringify(savedTemplate));
+  };
+
   return (
     <div className={styles.MessageTemplateEditor}>
       <h1 className={styles.MessageTemplateEditor__title}>Message Template Editor</h1>
-      <Editor variablesList={arrVarNames} setCompletedTemplate={setCompletedTemplate} />
+      <Editor variablesList={arrVarNames} setCompletedTemplate={setCompletedTemplate} setSavedTemplate={setSavedTemplate} />
       <Preview
         onClose={togglePreview}
         variablesList={arrVarNames}
@@ -28,7 +33,7 @@ const MessageTemplateEditor = ({ onClose }: { onClose: () => void }) => {
 
       <div className={styles['MessageTemplateEditor__buttons-wrapper']}>
         <Button title="Preview" onClick={togglePreview} />
-        <Button title="Save" />
+        <Button title="Save" onClick={saveEditorTemplate} />
         <Button title="Close editor" onClick={onClose} />
       </div>
     </div>
