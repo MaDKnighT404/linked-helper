@@ -1,90 +1,32 @@
-import React, { useState } from 'react';
+import React from 'react';
 import TextareaAutosize from 'react-textarea-autosize';
-import { nanoid } from 'nanoid';
+import useEditorHooks from '../../../Hooks/useEditorHooks';
 import { Button } from '../../Button';
-
+import { Element, NestedElement } from '../../../types';
 import styles from './Editor.module.scss';
 
-interface Element {
-  text: string;
-  id: string;
-  focused: boolean;
-  deepLevel: number;
-  count: number;
-  status: string;
-}
-
-type NestedElement = Element | NestedElement[];
-
-const recursiveAdjustment = (elements: NestedElement[], targetDeepLevel: number, targetCount: number, decrementLevelFrom: number): NestedElement[] => {
-  return elements.reduce((acc: NestedElement[], element: NestedElement) => {
-    if (Array.isArray(element)) {
-      const newNestedArray = recursiveAdjustment(element, targetDeepLevel, targetCount, decrementLevelFrom);
-      acc.push(newNestedArray);
-    } else {
-      const elementData = element as Element;
-      if (!(elementData.deepLevel === targetDeepLevel && elementData.count === targetCount && elementData.status !== 'status - start')) {
-        if (elementData.deepLevel > decrementLevelFrom) {
-          elementData.deepLevel -= 1;
-        }
-        acc.push(elementData);
-      }
-    }
-    return acc;
-  }, []);
-};
-
-const Editor: React.FC<{ variablesList: string[] }> = ({ variablesList }) => {
-  const [editorStructure, setEditorStructure] = useState<NestedElement[]>([
-    [{ text: 'start', id: nanoid(), focused: false, deepLevel: 1, count: 1, status: 'status - start' }],
-    [
-      { text: 'if 1-1', id: nanoid(), focused: false, deepLevel: 1, count: 1, status: 'if' },
-      { text: 'then 1-1', id: nanoid(), focused: false, deepLevel: 1, count: 1, status: 'then' },
-      [
-        { text: 'if 2-1', id: nanoid(), focused: false, deepLevel: 2, count: 1, status: 'if' },
-        { text: 'then 2-1', id: nanoid(), focused: false, deepLevel: 2, count: 1, status: 'then' },
-        [
-          { text: 'if 3-1', id: nanoid(), focused: false, deepLevel: 3, count: 1, status: 'if' },
-          { text: 'then 3-1', id: nanoid(), focused: false, deepLevel: 3, count: 1, status: 'then' },
-          [
-            { text: 'if 4-1', id: nanoid(), focused: false, deepLevel: 4, count: 1, status: 'if' },
-            { text: 'then 4-1', id: nanoid(), focused: false, deepLevel: 4, count: 1, status: 'then' },
-            { text: 'else 4-1', id: nanoid(), focused: false, deepLevel: 4, count: 1, status: 'else' },
-            { text: 'end 4-1', id: nanoid(), focused: false, deepLevel: 4, count: 1, status: 'status - end' },
-          ],
-          { text: 'else 3-1', id: nanoid(), focused: false, deepLevel: 3, count: 1, status: 'else' },
-          { text: 'end 3-1', id: nanoid(), focused: false, deepLevel: 3, count: 1, status: 'status - end' },
-        ],
-        { text: 'else 2-1', id: nanoid(), focused: false, deepLevel: 2, count: 1, status: 'else' },
-        { text: 'end 2-1', id: nanoid(), focused: false, deepLevel: 2, count: 1, status: 'status - end' },
-      ],
-      { text: 'else 1-1', id: nanoid(), focused: false, deepLevel: 1, count: 1, status: 'else' },
-      [
-        { text: 'if 2-2', id: nanoid(), focused: false, deepLevel: 2, count: 2, status: 'if' },
-        { text: 'then 2-2', id: nanoid(), focused: false, deepLevel: 2, count: 2, status: 'then' },
-        { text: 'else 2-2', id: nanoid(), focused: false, deepLevel: 2, count: 2, status: 'else' },
-        { text: 'end 2-2', id: nanoid(), focused: false, deepLevel: 2, count: 2, status: 'status - end' },
-      ],
-      { text: 'end 1-1', id: nanoid(), focused: false, deepLevel: 1, count: 1, status: 'status - end' },
-    ],
-  ]);
-
-  const handleDeleteButtonClick = (deepLevel: number, count: number) => {
-    const newEditorStructure = recursiveAdjustment(editorStructure, deepLevel, count, deepLevel);
-    setEditorStructure(newEditorStructure);
-  };
+const Editor = ({ variablesList }: { variablesList: string[] }) => {
+  const { editorStructure, handleSetFocus, handleDeleteButtonClick, handleTextareaChange, handleVariableButtonClick, handleCursorPositionChange } = useEditorHooks();
 
   const renderTextareaElements = (elements: NestedElement[]): JSX.Element[] => {
-    return elements.map((element) => {
+    return elements.map((element, index) => {
       if (Array.isArray(element)) {
-        return <React.Fragment key={nanoid()}>{renderTextareaElements(element)}</React.Fragment>;
+        return <React.Fragment key={index}>{renderTextareaElements(element)}</React.Fragment>;
       }
 
       const elementData = element as Element;
       if (element.status === 'status - start' || element.status === 'status - end') {
         return (
           <div style={{ marginLeft: element.deepLevel * 100 - 100 }} key={element.id}>
-            <TextareaAutosize id={element.id} className={styles.editor__textarea} value={element.text} />
+            <TextareaAutosize
+              id={element.id}
+              className={styles.editor__textarea}
+              value={element.text}
+              onFocus={(e) => handleSetFocus(e.target)}
+              onChange={(e) => handleTextareaChange(e.target.id, e.target.value)}
+              onClick={(e) => handleCursorPositionChange(e.currentTarget.selectionStart)}
+              onKeyUp={(e) => handleCursorPositionChange(e.currentTarget.selectionStart)}
+            />
           </div>
         );
       } else {
@@ -95,7 +37,15 @@ const Editor: React.FC<{ variablesList: string[] }> = ({ variablesList }) => {
                 <span className={styles.condition__state}>{elementData.status.toUpperCase()}</span>
                 {elementData.status === 'if' && <Button title="Delete" className="button_delete" onClick={() => handleDeleteButtonClick(elementData.deepLevel, elementData.count)} />}
               </div>
-              <TextareaAutosize className={styles.condition__textaria} value={elementData.text} />
+              <TextareaAutosize
+                id={element.id}
+                className={styles.condition__textaria}
+                value={elementData.text}
+                onFocus={(e) => handleSetFocus(e.target)}
+                onChange={(e) => handleTextareaChange(e.target.id, e.target.value)}
+                onClick={(e) => handleCursorPositionChange(e.currentTarget.selectionStart)}
+                onKeyUp={(e) => handleCursorPositionChange(e.currentTarget.selectionStart)}
+              />
             </div>
           </div>
         );
@@ -112,7 +62,7 @@ const Editor: React.FC<{ variablesList: string[] }> = ({ variablesList }) => {
       <ul className={styles['variables-list-editor']}>
         {variablesList.map((variable) => (
           <li className={styles.variable} key={variable}>
-            <Button className="button_variable" title={`{${variable}}`} />
+            <Button className="button_variable" title={`{${variable}}`} onClick={() => handleVariableButtonClick(`{${variable}}`)} />
           </li>
         ))}
       </ul>
