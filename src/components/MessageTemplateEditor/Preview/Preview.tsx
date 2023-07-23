@@ -1,20 +1,10 @@
 import TextareaAutosize from 'react-textarea-autosize';
-import { useEffect,useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button } from '../../Button';
-import { messageGenerator } from '../../../helpers/messageGenerator';
+import { messageGenerator } from '../../../helpers';
 import styles from './Preview.module.scss';
 
-const Preview = ({
-  variablesList,
-  template,
-  isOpen,
-  onClose,
-}: {
-  variablesList: string[];
-  template: string;
-  isOpen: boolean;
-  onClose: () => void;
-}) => {
+const Preview = ({ variablesList, template, isOpen, onClose }: { variablesList: string[]; template: string; isOpen: boolean; onClose: () => void }) => {
   const [inputValues, setInputValues] = useState<Record<string, string>>({});
   const [newTemplate, setNewTemplate] = useState(template);
 
@@ -37,22 +27,14 @@ const Preview = ({
       <div className={styles.preview} onClick={(event) => event.stopPropagation()}>
         <h2 className={styles.preview__title}>Message Preview</h2>
 
-        <TextareaAutosize
-          className={styles.preview__textarea}
-          value={newTemplate}
-          readOnly
-        />
+        <TextareaAutosize className={styles.preview__textarea} value={newTemplate} readOnly />
 
         <h4 className={styles.preview__subtitle}>Variables</h4>
         <ul className={styles['variables-list-preview']}>
           {variablesList.map((variable) => (
             <li className={styles.variable} key={variable}>
               <label className={styles.variable__label}>{variable} :</label>
-              <input
-                className={styles.variable__input}
-                type="text"
-                onChange={(e) => handleInputChange(variable, e.target.value)}
-              />
+              <input className={styles.variable__input} type="text" onChange={(e) => handleInputChange(variable, e.target.value)} />
             </li>
           ))}
         </ul>

@@ -68,7 +68,6 @@ const Editor = ({ variablesList }: { variablesList: string[] }) => {
       </ul>
 
       <Button title="Click to add: IF [{some variable} or expression] THEN [then_value] ELSE [else_value]" className="button_condition" onClick={handleAddNewBlock} />
-      <Button title="get full" className="button_condition" />
 
       <h4 className={styles.editor__subtitle}>Message template</h4>
       <div className={styles['editor__message-wrapper']}>{renderTextareaElements(editorStructure)}</div>
