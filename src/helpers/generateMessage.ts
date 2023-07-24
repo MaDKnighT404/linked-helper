@@ -1,7 +1,9 @@
+import interpolateVariables from './interpolateVariables';
 import { Element, NestedElement } from '../types';
-import { arrVarNames } from '../components/Main/Main';
+
 // Функция генерации сообщения
-export const generateMessage = (array: NestedElement[], values: Record<string, string>) => {
+const generateMessage = (template: NestedElement[], values: Record<string, string>, arrVarNames: string[]) => {
+  
   let result = '';
 
   const recursiveParse = (nestedArr: NestedElement[]): string => {
@@ -46,30 +48,8 @@ export const generateMessage = (array: NestedElement[], values: Record<string, s
     return recursiveString;
   };
 
-  result = recursiveParse(array);
+  result = recursiveParse(template);
   return result;
 };
 
-//заменяет в переданной строке переменные в виде {variable} на их соответствующие значения.
-export function interpolateVariables(
-  template: string,
-  arrVarNames: string[],
-  values: Record<string, string>
-): string {
-  if (template === undefined) {
-    return '';
-  }
-
-  const regex = /\{([^}]+)\}/g;
-
-  const generatedMessage = template.replace(regex, (_, variable: string) => {
-    // Заменяем только переменные, которые присутствуют в arrVarNames
-    if (arrVarNames.includes(variable)) {
-      return values[variable] || '';
-    }
-    // В противном случае оставляем переменную в тексте без изменений
-    return `{${variable}}`;
-  });
-
-  return generatedMessage;
-}
+export default generateMessage;

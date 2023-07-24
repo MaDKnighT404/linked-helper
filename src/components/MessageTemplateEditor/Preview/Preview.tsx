@@ -1,7 +1,7 @@
-import TextareaAutosize from 'react-textarea-autosize';
 import { useEffect, useState } from 'react';
+import TextareaAutosize from 'react-textarea-autosize';
+import { generateMessage } from '../../../helpers';
 import { Button } from '../../Button';
-import { generateMessage } from '../../../helpers/generateMessage';
 import { NestedElement } from '../../../types';
 import styles from './Preview.module.scss';
 
@@ -28,10 +28,10 @@ const Preview = ({
 
   useEffect(() => {
     if (isOpen && widgetStructure) {
-      const newTemplate = generateMessage(widgetStructure, inputValues);
+      const newTemplate = generateMessage(widgetStructure, inputValues, arrVarNames);
       setNewTemplate(newTemplate);
     }
-  }, [isOpen, inputValues, widgetStructure]);
+  }, [isOpen, inputValues, widgetStructure, arrVarNames]);
 
   return (
     <div className={`${styles['preview-substrate']} ${isOpen && styles['preview-substrate_open']}`}>
