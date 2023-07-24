@@ -19,6 +19,7 @@ const MessageTemplateEditor = ({
   const [isOpenPreview, setIsOpenPreview] = useState(false);
   const [widgetStructure, setWidgetStructure] = useState<NestedElement[] | null>(template || null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isExiting, setIsExiting] = useState(false);
 
   const togglePreview = () => {
     setIsOpenPreview((prev) => !prev);
@@ -35,8 +36,21 @@ const MessageTemplateEditor = ({
       });
   };
 
+  const handleClose = () => {
+    setIsExiting(true);
+  };
+
+  const handleAnimationEnd = () => {
+    if (isExiting) {
+      onClose();
+    }
+  };
+
   return (
-    <div className={styles.MessageTemplateEditor}>
+    <div
+      className={`${styles.MessageTemplateEditor} ${isExiting ? styles.exiting : ''}`}
+      onAnimationEnd={handleAnimationEnd}
+    >
       <h1 className={styles.MessageTemplateEditor__title}>Message Template Editor</h1>
       <Editor variablesList={arrVarNames} setWidgetStructure={setWidgetStructure} />
       <Preview
@@ -49,7 +63,7 @@ const MessageTemplateEditor = ({
       <div className={styles['MessageTemplateEditor__buttons-wrapper']}>
         <Button title="Preview" onClick={togglePreview} />
         <Button title={isLoading ? 'Loading...' : 'Save'} onClick={handleSave} />
-        <Button title="Close editor" onClick={onClose} />
+        <Button title="Close editor" onClick={handleClose} />
       </div>
     </div>
   );
