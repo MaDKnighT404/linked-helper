@@ -15,7 +15,7 @@ const useEditorHooks = () => {
   );
   const [cursorPosition, setCursorPosition] = useState<number>(0);
   const [deepLevelCounts, setDeepLevelCounts] = useState<{ [key: number]: number }>({ 1: 1 });
-  console.log(focusedElementId);
+
   const handleSetFocus = (element: HTMLTextAreaElement) => {
     setFocusedElementId(element.id);
   };
