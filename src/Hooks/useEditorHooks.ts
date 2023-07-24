@@ -4,6 +4,10 @@ import { template } from '../components/Main/Main';
 import { Element, NestedElement } from '../types';
 import { insertBlockAfterFocused, updateTextInElement, recursiveAdjustment } from '../helpers';
 
+//кастомный хук, который предназначен для работы компонента Editor. Он управляет состоянием, относящимся к структуре редактора, текущему элементу, на котором находится фокус, и позиции курсора. Он также предоставляет несколько функций обработчиков, которые можно использовать для обновления этих состояний
+
+// так как хук получился очень большой практически вся логика его работы находится во вспомогательных функциях внутри папки helpers
+
 const useEditorHooks = () => {
   const [editorStructure, setEditorStructure] = useState<NestedElement[]>(template);
   const [focusedElementId, setFocusedElementId] = useState<string | null>(null);
