@@ -10,10 +10,12 @@ import { insertBlockAfterFocused, updateTextInElement, recursiveAdjustment } fro
 
 const useEditorHooks = () => {
   const [editorStructure, setEditorStructure] = useState<NestedElement[]>(template);
-  const [focusedElementId, setFocusedElementId] = useState<string | null>(null);
+  const [focusedElementId, setFocusedElementId] = useState<string | null>(
+    '(1)(start)|START-TEXT-AREA'
+  );
   const [cursorPosition, setCursorPosition] = useState<number>(0);
   const [deepLevelCounts, setDeepLevelCounts] = useState<{ [key: number]: number }>({ 1: 1 });
-
+  console.log(focusedElementId);
   const handleSetFocus = (element: HTMLTextAreaElement) => {
     setFocusedElementId(element.id);
   };
@@ -47,7 +49,7 @@ const useEditorHooks = () => {
   };
 
   const handleAddNewBlock = () => {
-    if (!focusedElementId || cursorPosition === null) return;
+    if (!focusedElementId || cursorPosition === 0) return;
 
     const infoSection = focusedElementId.split('|')[0];
     const rawId = focusedElementId.split('|')[1];
@@ -103,7 +105,8 @@ const useEditorHooks = () => {
       newBlock,
       rawId
     );
-    setFocusedElementId(null);
+    const newBlockid = `(${newBlock[0].deepLevel})(if)|${newBlock[0].id}`;
+    setFocusedElementId(newBlockid);
     setEditorStructure(newEditorStructure);
   };
 
