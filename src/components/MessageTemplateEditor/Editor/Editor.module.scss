@@ -8,13 +8,6 @@
 
   &__textarea {
     width: calc(100% - 40px);
-    height: auto;
-    resize: none;
-    padding: 10px;
-    margin: 0;
-    scrollbar-gutter: stable;
-    text-indent: 15px;
-    outline: none;
   }
 
   .variables-list-editor {
@@ -28,5 +21,33 @@
 
   .variable {
     margin: 5px;
+  }
+}
+
+.condition {
+  margin: 15px 0;
+
+  &__label {
+    display: flex;
+    align-items: center;
+  }
+
+  &__state-wrapper {
+    width: 130px;
+    display: flex;
+    align-items: center;
+    gap: 25px;
+  }
+
+  &__state {
+    padding: 5px;
+    border-radius: 5px;
+    color: white;
+    background-color: rgb(96, 141, 29);
+  }
+
+  &__textaria {
+    min-width: 50px;
+    width: calc(100% - 170px);
   }
 }

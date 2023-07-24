@@ -1,12 +1,9 @@
-export type CompletedTemplateItem = {
-  start?: string;
-  if: string;
-  then: string;
-  else: string;
-  end: string;
-};
-
-export type FocusedItem = {
-  focusedTextaria: HTMLTextAreaElement;
+export interface Element {
+  text: string;
+  id: string;
   deepLevel: number;
-};
+  count: number;
+  status: string;
+}
+
+export type NestedElement = Element | NestedElement[];

@@ -2,51 +2,68 @@ import { useState } from 'react';
 import { Button } from '../Button';
 import { Editor } from './Editor';
 import { Preview } from './Preview';
-import { CompletedTemplateItem } from '../../types';
+import { NestedElement } from '../../types';
 import styles from './MessageTemplateEditor.module.scss';
 
-const MessageTemplateEditor = ({ onClose }: { onClose: () => void }) => {
-  const arrVarNames = localStorage.arrVarNames
-    ? JSON.parse(localStorage.arrVarNames)
-    : ['firstname', 'lastname', 'company', 'position'];
-
-  const initialTemplate = `
-  hello {firstname},
-
-this is {lastname}
-
-company is {company}
-
-and position is {position}`;
-
+const MessageTemplateEditor = ({
+  arrVarNames,
+  template,
+  callbackSave,
+  onClose,
+}: {
+  arrVarNames: string[];
+  template?: NestedElement[];
+  callbackSave: (structure: NestedElement[] | null) => Promise<void>;
+  onClose: () => void;
+}) => {
   const [isOpenPreview, setIsOpenPreview] = useState(false);
-  const [completedTemplate, setCompletedTemplate] = useState<CompletedTemplateItem[]>([
-    { start: initialTemplate, if: '', then: '', else: '', end: '' },
-  ]);
+  const [widgetStructure, setWidgetStructure] = useState<NestedElement[] | null>(template || null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isExiting, setIsExiting] = useState(false);
 
   const togglePreview = () => {
     setIsOpenPreview((prev) => !prev);
   };
-  console.log(completedTemplate);
+
+  const handleSave = () => {
+    setIsLoading(true);
+    callbackSave(widgetStructure)
+      .then(() => {
+        setIsLoading(false);
+      })
+      .catch(() => {
+        setIsLoading(false);
+      });
+  };
+
+  const handleClose = () => {
+    setIsExiting(true);
+  };
+
+  const handleAnimationEnd = () => {
+    if (isExiting) {
+      onClose();
+    }
+  };
+
   return (
-    <div className={styles.MessageTemplateEditor}>
+    <div
+      className={`${styles.MessageTemplateEditor} ${isExiting ? styles.exiting : ''}`}
+      onAnimationEnd={handleAnimationEnd}
+    >
       <h1 className={styles.MessageTemplateEditor__title}>Message Template Editor</h1>
-      <Editor
-        variablesList={arrVarNames}
-        completedTemplate={completedTemplate}
-        setCompletedTemplate={setCompletedTemplate}
-      />
+      <Editor variablesList={arrVarNames} setWidgetStructure={setWidgetStructure} />
       <Preview
+        arrVarNames={arrVarNames}
+        widgetStructure={widgetStructure}
         onClose={togglePreview}
-        variablesList={arrVarNames}
-        template={completedTemplate[0].start as string} // need calculate result
         isOpen={isOpenPreview}
       />
 
       <div className={styles['MessageTemplateEditor__buttons-wrapper']}>
         <Button title="Preview" onClick={togglePreview} />
-        <Button title="Save" />
-        <Button title="Close editor" onClick={onClose} />
+        <Button title={isLoading ? 'Loading...' : 'Save'} onClick={handleSave} />
+        <Button title="Close editor" onClick={handleClose} />
       </div>
     </div>
   );

@@ -1,65 +1,89 @@
+import React, { useEffect } from 'react';
 import TextareaAutosize from 'react-textarea-autosize';
-import { Dispatch, useState } from 'react';
-import { nanoid } from 'nanoid';
+import useEditorHooks from '../../../Hooks/useEditorHooks';
 import { Button } from '../../Button';
-import { Condition } from './Condition';
+import { Element, NestedElement } from '../../../types';
 
 import styles from './Editor.module.scss';
-import { CompletedTemplateItem, FocusedItem } from '../../../types';
 
 const Editor = ({
   variablesList,
-  completedTemplate,
-  setCompletedTemplate,
+  setWidgetStructure,
 }: {
   variablesList: string[];
-  completedTemplate: CompletedTemplateItem[];
-  setCompletedTemplate: Dispatch<React.SetStateAction<CompletedTemplateItem[]>>;
+  setWidgetStructure: (value: NestedElement[]) => void;
 }) => {
-  const [conditions, setConditions] = useState<string[]>([]);
-  const [focusedItem, setFocusedItem] = useState<FocusedItem | null>(null);
+  const {
+    editorStructure,
+    handleSetFocus,
+    handleDeleteButtonClick,
+    handleTextareaChange,
+    handleVariableButtonClick,
+    handleCursorPositionChange,
+    handleAddNewBlock,
+  } = useEditorHooks();
 
-  const handleVariableButtonClick = (variable: string) => {};
+  //так как по заданию было сказано, что использование стейтменеджеров не желательно, тут используется useEffect для обновления состояния структуры редактора для её использования в родительском компоненте
+  useEffect(() => {
+    setWidgetStructure(editorStructure);
+  }, [editorStructure, setWidgetStructure]);
 
-  const handleAddCondition = () => {
-    setConditions((prevConditions) => [...prevConditions, nanoid()]);
+  // функция для обхода структуры редактора и создания из неё разметки.
+  const renderTextareaElements = (elements: NestedElement[]): JSX.Element[] => {
+    return elements.map((element, index) => {
+      if (Array.isArray(element)) {
+        return <React.Fragment key={index}>{renderTextareaElements(element)}</React.Fragment>;
+      }
 
-    // Add a new empty CompletedTemplateItem to the completedTemplate array
-    setCompletedTemplate((prevCompletedTemplate) => [
-      ...prevCompletedTemplate,
-      { if: '', then: '', else: '', end: '' },
-    ]);
-  };
-
-  const handleDeleteCondition = (index: number) => {
-    setConditions((prevConditions) => {
-      const updatedConditions = [...prevConditions];
-      updatedConditions.splice(index, 1);
-      return updatedConditions;
+      const elementData = element as Element;
+      if (element.status === 'start' || element.status === 'end') {
+        return (
+          <div style={{ marginLeft: element.deepLevel * 130 - 130 }} key={element.id}>
+            <TextareaAutosize
+              id={`(${element.deepLevel})(${element.status})|${element.id}`}
+              className={styles.editor__textarea}
+              value={element.text}
+              onFocus={(e) => handleSetFocus(e.target)}
+              onChange={(e) => handleTextareaChange(e.target.value)}
+              onClick={(e) => handleCursorPositionChange(e.currentTarget.selectionStart)}
+              onKeyUp={(e) => handleCursorPositionChange(e.currentTarget.selectionStart)}
+            />
+          </div>
+        );
+      } else {
+        return (
+          <div
+            className={styles.condition}
+            style={{ marginLeft: elementData.deepLevel * 130 - 130 }}
+            key={elementData.id}
+          >
+            <div className={styles.condition__label}>
+              <div className={styles['condition__state-wrapper']}>
+                <span className={styles.condition__state}>{elementData.status.toUpperCase()}</span>
+                {elementData.status === 'if' && (
+                  <Button
+                    title="Delete"
+                    className="button_delete"
+                    onClick={() =>
+                      handleDeleteButtonClick(elementData.deepLevel, elementData.count)
+                    }
+                  />
+                )}
+              </div>
+              <TextareaAutosize
+                id={`(${element.deepLevel})(${element.status})|${element.id}`}
+                className={styles.condition__textaria}
+                value={elementData.text}
+                onFocus={(e) => handleSetFocus(e.target)}
+                onChange={(e) => handleTextareaChange(e.target.value)}
+                onClick={(e) => handleCursorPositionChange(e.currentTarget.selectionStart)}
+                onKeyUp={(e) => handleCursorPositionChange(e.currentTarget.selectionStart)}
+              />
+            </div>
+          </div>
+        );
+      }
     });
-
-    setCompletedTemplate((prevCompletedTemplate) =>
-      prevCompletedTemplate.filter((_, i) => i !== index + 1)
-    );
-  };
-
-  const handleTextareaChange = (
-    event: React.ChangeEvent<HTMLTextAreaElement>,
-    property: keyof CompletedTemplateItem,
-    index: number
-  ) => {
-    const updatedCompletedTemplate = completedTemplate.map((item, i) =>
-      i === index ? { ...item, [property]: event.target.value } : item
-    );
-    setCompletedTemplate(updatedCompletedTemplate);
-  };
-
-  const handleTextareaFocus = (
-    event: React.FocusEvent<HTMLTextAreaElement>,
-    property: keyof CompletedTemplateItem,
-    deepLevel: number
-  ) => {
-    setFocusedItem({ focusedTextaria: event.target, deepLevel });
   };
 
   return (
@@ -74,7 +98,7 @@ const Editor = ({
             <Button
               className="button_variable"
               title={`{${variable}}`}
-              onClick={() => handleVariableButtonClick(variable)}
+              onClick={() => handleVariableButtonClick(`{${variable}}`)}
             />
           </li>
         ))}
@@ -83,33 +107,12 @@ const Editor = ({
       <Button
         title="Click to add: IF [{some variable} or expression] THEN [then_value] ELSE [else_value]"
         className="button_condition"
-        onClick={handleAddCondition}
+        onClick={handleAddNewBlock}
       />
 
       <h4 className={styles.editor__subtitle}>Message template</h4>
       <div className={styles['editor__message-wrapper']}>
-        <TextareaAutosize
-          className={styles.editor__textarea}
-          value={completedTemplate[0].start}
-          onChange={(event) => handleTextareaChange(event, 'start', 0)}
-          onFocus={(event) => handleTextareaFocus(event, 'start', 0)}
-        />
-        {conditions.map((condition, index) => (
-          <div key={condition}>
-            <Condition
-              onDelete={() => handleDeleteCondition(index)}
-              onTextareaChange={handleTextareaChange}
-              conditionData={completedTemplate[index + 1]}
-              index={index + 1}
-            />
-            <TextareaAutosize
-              className={styles.editor__textarea}
-              value={completedTemplate[index + 1].end}
-              onChange={(event) => handleTextareaChange(event, 'end', index + 1)}
-              onFocus={(event) => handleTextareaFocus(event, 'end', index + 1)}
-            />
-          </div>
-        ))}
+        {renderTextareaElements(editorStructure)}
       </div>
     </div>
   );
