@@ -27,11 +27,6 @@
   scrollbar-gutter: stable;
   animation: previewAppear 0.5s;
 
-  &__textarea {
-    width: 100%;
-    cursor: default;
-  }
-
   &__variables {
     display: flex;
     flex-direction: column;
