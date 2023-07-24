@@ -6,9 +6,7 @@ import { insertBlockAfterFocused, updateTextInElement, recursiveAdjustment } fro
 
 const useEditorHooks = () => {
   const [editorStructure, setEditorStructure] = useState<NestedElement[]>(template);
-  const [focusedElementId, setFocusedElementId] = useState<string | null>(
-    '(1)(start)|START-TEXT-AREA'
-  );
+  const [focusedElementId, setFocusedElementId] = useState<string | null>(null);
   const [cursorPosition, setCursorPosition] = useState<number>(0);
   const [deepLevelCounts, setDeepLevelCounts] = useState<{ [key: number]: number }>({ 1: 1 });
 
@@ -101,7 +99,7 @@ const useEditorHooks = () => {
       newBlock,
       rawId
     );
-    setFocusedElementId(focusedElementId);
+    setFocusedElementId(null);
     setEditorStructure(newEditorStructure);
   };
 
