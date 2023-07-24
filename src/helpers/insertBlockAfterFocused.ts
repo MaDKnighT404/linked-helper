@@ -1,4 +1,4 @@
-import { Element, NestedElement } from "../types";
+import { Element, NestedElement } from '../types';
 
 const insertBlockAfterFocused = (
   elements: NestedElement[],

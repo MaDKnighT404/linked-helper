@@ -4,3 +4,23 @@
   flex-direction: column;
   min-height: 100vh;
 }
+
+textarea {
+  max-width: 100%;
+  padding: 5px 0px;
+  margin: 0;
+  text-indent: 5px;
+  resize: none;
+  display: inline-block;
+  outline: 2px solid transparent;
+  border: 2px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+  font-family: 'Open Sans', sans-serif;
+  font-size: 1em;
+  scrollbar-gutter: stable;
+
+  &:focus {
+    border: 2px solid #56a429;
+  }
+}

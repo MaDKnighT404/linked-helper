@@ -28,12 +28,7 @@
   animation: previewAppear 0.5s;
 
   &__textarea {
-    width: calc(100% - 40px);
-    resize: none;
-    padding: 10px;
-    margin: 0;
-    scrollbar-gutter: stable;
-    outline: none;
+    width: 100%;
     cursor: default;
   }
 
@@ -64,6 +59,18 @@
 
     &__input {
       max-width: 500px;
+      width: auto;
+      padding: 5px 10px;
+      margin: 5px 0;
+      outline: 2px solid transparent;
+      border: 2px solid #ccc;
+      border-radius: 5px;
+      font-size: 1em;
+      cursor: pointer;
+
+      &:focus {
+        border: 2px solid #56a429;
+      }
     }
   }
 

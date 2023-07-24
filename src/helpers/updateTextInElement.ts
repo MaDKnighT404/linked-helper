@@ -1,6 +1,5 @@
-import { Element, NestedElement } from '../types';
 import updateNestedArray from './updateNestedArray';
-
+import { Element, NestedElement } from '../types';
 
 const updateTextInElement = (
   editorStructure: NestedElement[],

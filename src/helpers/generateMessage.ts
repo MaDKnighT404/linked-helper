@@ -51,7 +51,11 @@ export const generateMessage = (array: NestedElement[], values: Record<string, s
 };
 
 //заменяет в переданной строке переменные в виде {variable} на их соответствующие значения.
-export function interpolateVariables(template: string, arrVarNames: string[], values: Record<string, string>): string {
+export function interpolateVariables(
+  template: string,
+  arrVarNames: string[],
+  values: Record<string, string>
+): string {
   if (template === undefined) {
     return '';
   }

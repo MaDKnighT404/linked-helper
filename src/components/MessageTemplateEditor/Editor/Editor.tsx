@@ -38,7 +38,7 @@ const Editor = ({
       const elementData = element as Element;
       if (element.status === 'start' || element.status === 'end') {
         return (
-          <div style={{ marginLeft: element.deepLevel * 100 - 100 }} key={element.id}>
+          <div style={{ marginLeft: element.deepLevel * 130 - 130 }} key={element.id}>
             <TextareaAutosize
               id={`(${element.deepLevel})(${element.status})|${element.id}`}
               className={styles.editor__textarea}
@@ -53,8 +53,8 @@ const Editor = ({
       } else {
         return (
           <div
-            className={styles.condition__part}
-            style={{ marginLeft: elementData.deepLevel * 100 - 100 }}
+            className={styles.condition}
+            style={{ marginLeft: elementData.deepLevel * 130 - 130 }}
             key={elementData.id}
           >
             <div className={styles.condition__label}>

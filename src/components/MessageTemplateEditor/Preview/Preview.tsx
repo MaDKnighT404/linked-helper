@@ -6,15 +6,15 @@ import { NestedElement } from '../../../types';
 import styles from './Preview.module.scss';
 
 const Preview = ({
-  variablesList,
+  arrVarNames,
+  widgetStructure,
   isOpen,
   onClose,
-  widgetStructure,
 }: {
-  variablesList: string[];
+  arrVarNames: string[];
+  widgetStructure: NestedElement[] | null;
   isOpen: boolean;
   onClose: () => void;
-  widgetStructure: NestedElement[] | null;
 }) => {
   const [inputValues, setInputValues] = useState<Record<string, string>>({});
   const [newTemplate, setNewTemplate] = useState('');
@@ -42,7 +42,7 @@ const Preview = ({
 
         <h4 className={styles.preview__subtitle}>Variables</h4>
         <ul className={styles['variables-list-preview']}>
-          {variablesList.map((variable) => (
+          {arrVarNames.map((variable) => (
             <li className={styles.variable} key={variable}>
               <label className={styles.variable__label}>{variable} :</label>
               <input

@@ -12,12 +12,12 @@ const MessageTemplateEditor = ({
   onClose,
 }: {
   arrVarNames: string[];
-  template: NestedElement[];
+  template?: NestedElement[];
   callbackSave: (structure: NestedElement[] | null) => Promise<void>;
   onClose: () => void;
 }) => {
   const [isOpenPreview, setIsOpenPreview] = useState(false);
-  const [widgetStructure, setWidgetStructure] = useState<NestedElement[] | null>(template);
+  const [widgetStructure, setWidgetStructure] = useState<NestedElement[] | null>(template || null);
   const [isLoading, setIsLoading] = useState(false);
 
   const togglePreview = () => {
@@ -32,7 +32,7 @@ const MessageTemplateEditor = ({
       })
       .catch(() => {
         setIsLoading(false);
-      })
+      });
   };
 
   return (
@@ -40,7 +40,7 @@ const MessageTemplateEditor = ({
       <h1 className={styles.MessageTemplateEditor__title}>Message Template Editor</h1>
       <Editor variablesList={arrVarNames} setWidgetStructure={setWidgetStructure} />
       <Preview
-        variablesList={arrVarNames}
+        arrVarNames={arrVarNames}
         widgetStructure={widgetStructure}
         onClose={togglePreview}
         isOpen={isOpenPreview}
