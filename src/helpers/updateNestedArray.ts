@@ -1,5 +1,7 @@
 import { Element, NestedElement } from '../types';
 
+// функция применяет заданное действие (action) ко всем элементам во вложенном массиве (elements), принимая во внимание, что элементы могут быть вложенными массивами.
+
 const updateNestedArray = (
   elements: NestedElement[],
   action: (element: Element) => Element

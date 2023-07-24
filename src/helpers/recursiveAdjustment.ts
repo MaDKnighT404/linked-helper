@@ -1,5 +1,7 @@
 import { Element, NestedElement } from '../types';
 
+// функция рекурсивно обрабатывает структуру данных, содержащую вложенные элементы, и изменяет глубину уровня (deepLevel) для определенных элементов, а также удаляет определенные элементы, соответствующие заданным условиям.
+
 const recursiveAdjustment = (
   elements: NestedElement[],
   targetDeepLevel: number,
