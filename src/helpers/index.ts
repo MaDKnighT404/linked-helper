@@ -63,14 +63,3 @@ export const recursiveAdjustment = (elements: NestedElement[], targetDeepLevel: 
     return acc;
   }, []);
 };
-
-export const concatenateTexts = (elements: NestedElement[]): string => {
-  return elements.reduce((acc: string, element: NestedElement) => {
-    if (Array.isArray(element)) {
-      return acc + concatenateTexts(element);
-    } else {
-      const elementData = element as Element;
-      return acc + `${elementData.status} ${elementData.text} \n`;
-    }
-  }, '');
-};

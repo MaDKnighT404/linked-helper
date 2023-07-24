@@ -1,79 +1,10 @@
 import TextareaAutosize from 'react-textarea-autosize';
 import { useEffect, useState } from 'react';
 import { Button } from '../../Button';
-import { concatenateTexts } from '../../../helpers';
+import { generateMessage } from '../../../helpers/generateMessage';
+import { NestedElement } from '../../../types';
 import styles from './Preview.module.scss';
-import { Element, NestedElement } from '../../../types';
 
-export function messageGenerator(template: string, values: Record<string, string>): string {
-  if (template === undefined) {
-    return '';
-  }
-
-  const regex = /\{([^}]+)\}/g;
-
-  const generatedMessage = template.replace(regex, (_, variable: string) => values[variable] || '');
-
-  return generatedMessage;
-}
-
-const generateMessage = (arr: NestedElement[], values: Record<string, string>) => {
-  let message = '';
-
-  const recursiveParse = (nestedArr: NestedElement[]): string => {
-    let localMessage = '';
-
-    for (let i = 0; i < nestedArr.length; i++) {
-      const element = nestedArr[i];
-      if (Array.isArray(element)) {
-        localMessage += recursiveParse(element);
-      } else {
-        const elementData = element as Element;
-
-        if (elementData.text !== undefined) {
-          const processedText = messageGenerator(elementData.text, values);
-
-          if (elementData.status === 'start') {
-            localMessage += processedText + ' ';
-          } else if (elementData.status === 'if') {
-            const condition = processedText.trim();
-            if (condition !== '') {
-              i += 1;
-              if (nestedArr[i]) {
-                if(Array.isArray(nestedArr[i])) {
-                  localMessage += recursiveParse(nestedArr[i] as Element[]);
-                } else {
-                  const thenText = messageGenerator((nestedArr[i] as Element).text, values);
-                  localMessage += thenText + ' ';
-                }
-              }
-              i += 1;
-            } else {
-              i += 2;
-              if (nestedArr[i]) {
-                if(Array.isArray(nestedArr[i])) {
-                  localMessage += recursiveParse(nestedArr[i] as Element[]);
-                } else {
-                  const elseText = messageGenerator((nestedArr[i] as Element).text, values);
-                  localMessage += elseText + ' ';
-                }
-              }
-            }
-          } else if (elementData.status === 'end') {
-            const endText = messageGenerator(elementData.text, values);
-            localMessage += endText + ' ';
-          }
-        }
-      }
-    }
-    return localMessage;
-  };
-
-
-  message = recursiveParse(arr);
-
-  return message;
-};
 
 
 const Preview = ({ variablesList, isOpen, onClose, savedTemplateStructure }: { variablesList: string[]; isOpen: boolean; onClose: () => void; savedTemplateStructure: NestedElement[] | null }) => {
@@ -89,7 +20,6 @@ const Preview = ({ variablesList, isOpen, onClose, savedTemplateStructure }: { v
 
   useEffect(() => {
     if (isOpen && savedTemplateStructure) {
-      console.log(savedTemplateStructure);
       const newTemplate = generateMessage(savedTemplateStructure, inputValues);
       setNewTemplate(newTemplate);
     }

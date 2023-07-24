@@ -4,13 +4,13 @@ import { Element, NestedElement } from '../types';
 import { insertBlockAfterFocused, recursiveAdjustment } from '../helpers';
 
 const useEditorHooks = () => {
-  const initialEditorStructure = localStorage.getItem('editorTemplate') 
-  ? JSON.parse(localStorage.getItem('editorTemplate')!) 
-  : [[{ text: 'Hello! You can added here any message!', id: nanoid(), deepLevel: 1, count: 1, status: 'start' }]];
+  const initialEditorStructure = localStorage.getItem('template')
+    ? JSON.parse(localStorage.getItem('template')!)
+    : [[{ text: 'Hello! You can added here any message!', id: `START-TEXT-AREA`, deepLevel: 1, count: 1, status: 'start' }]];
 
-  const [focusedElementId, setFocusedElementId] = useState<string | null>(null);
-  const [cursorPosition, setCursorPosition] = useState<number>(0);
   const [editorStructure, setEditorStructure] = useState<NestedElement[]>(initialEditorStructure);
+  const [focusedElementId, setFocusedElementId] = useState<string | null>('(1)(start)|START-TEXT-AREA');
+  const [cursorPosition, setCursorPosition] = useState<number>(0);
   const [deepLevelCounts, setDeepLevelCounts] = useState<{ [key: number]: number }>({ 1: 1 });
 
   const handleSetFocus = (element: HTMLTextAreaElement) => {
@@ -61,7 +61,7 @@ const useEditorHooks = () => {
         }
       });
     };
-    setFocusedElementId(null);
+    setCursorPosition((prevPosition) => prevPosition + variableText.length);
     const newEditorStructure = updateTextInNestedArray(editorStructure);
     setEditorStructure(newEditorStructure);
   };
@@ -117,7 +117,7 @@ const useEditorHooks = () => {
     ];
 
     const newEditorStructure = insertBlockAfterFocused(editorStructureWithUpdatedText, newBlock, rawId);
-    setFocusedElementId(null);
+    setFocusedElementId(focusedElementId);
     setEditorStructure(newEditorStructure);
   };
 

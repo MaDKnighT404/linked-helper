@@ -6,9 +6,9 @@ import { Preview } from './Preview';
 import styles from './MessageTemplateEditor.module.scss';
 import { NestedElement } from '../../types';
 
-const MessageTemplateEditor = ({ onClose }: { onClose: () => void }) => {
-  const arrVarNames = localStorage.arrVarNames ? JSON.parse(localStorage.arrVarNames) : ['firstname', 'lastname', 'company', 'position'];
+export const arrVarNames = localStorage.arrVarNames ? JSON.parse(localStorage.arrVarNames) : ['firstname', 'lastname', 'company', 'position'];
 
+const MessageTemplateEditor = ({ onClose }: { onClose: () => void }) => {
   const [isOpenPreview, setIsOpenPreview] = useState(false);
   const [savedTemplateStructure, setSavedTemplateStructure] = useState<NestedElement[] | null>(null);
 
@@ -17,7 +17,7 @@ const MessageTemplateEditor = ({ onClose }: { onClose: () => void }) => {
   };
 
   const saveEditorTemplate = () => {
-    localStorage.setItem('editorTemplate', JSON.stringify(savedTemplateStructure));
+    localStorage.setItem('template', JSON.stringify(savedTemplateStructure));
   };
 
   return (
@@ -25,9 +25,9 @@ const MessageTemplateEditor = ({ onClose }: { onClose: () => void }) => {
       <h1 className={styles.MessageTemplateEditor__title}>Message Template Editor</h1>
       <Editor variablesList={arrVarNames} setSavedTemplateStructure={setSavedTemplateStructure} />
       <Preview
-        onClose={togglePreview}
         variablesList={arrVarNames}
         savedTemplateStructure={savedTemplateStructure}
+        onClose={togglePreview}
         isOpen={isOpenPreview}
       />
 
