@@ -1,5 +1,5 @@
 import { Element, NestedElement } from '../types';
-import { arrVarNames } from '../components/MessageTemplateEditor/MessageTemplateEditor';
+import { arrVarNames } from '../components/Main/Main';
 // Функция генерации сообщения
 export const generateMessage = (array: NestedElement[], values: Record<string, string>) => {
   let result = '';

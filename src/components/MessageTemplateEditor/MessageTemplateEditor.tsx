@@ -2,38 +2,53 @@ import { useState } from 'react';
 import { Button } from '../Button';
 import { Editor } from './Editor';
 import { Preview } from './Preview';
-
-import styles from './MessageTemplateEditor.module.scss';
 import { NestedElement } from '../../types';
+import styles from './MessageTemplateEditor.module.scss';
 
-export const arrVarNames = localStorage.arrVarNames ? JSON.parse(localStorage.arrVarNames) : ['firstname', 'lastname', 'company', 'position'];
-
-const MessageTemplateEditor = ({ onClose }: { onClose: () => void }) => {
+const MessageTemplateEditor = ({
+  arrVarNames,
+  template,
+  callbackSave,
+  onClose,
+}: {
+  arrVarNames: string[];
+  template: NestedElement[];
+  callbackSave: (structure: NestedElement[] | null) => Promise<void>;
+  onClose: () => void;
+}) => {
   const [isOpenPreview, setIsOpenPreview] = useState(false);
-  const [savedTemplateStructure, setSavedTemplateStructure] = useState<NestedElement[] | null>(null);
+  const [widgetStructure, setWidgetStructure] = useState<NestedElement[] | null>(template);
+  const [isLoading, setIsLoading] = useState(false);
 
   const togglePreview = () => {
     setIsOpenPreview((prev) => !prev);
   };
 
-  const saveEditorTemplate = () => {
-    localStorage.setItem('template', JSON.stringify(savedTemplateStructure));
+  const handleSave = () => {
+    setIsLoading(true);
+    callbackSave(widgetStructure)
+      .then(() => {
+        setIsLoading(false);
+      })
+      .catch(() => {
+        setIsLoading(false);
+      })
   };
 
   return (
     <div className={styles.MessageTemplateEditor}>
       <h1 className={styles.MessageTemplateEditor__title}>Message Template Editor</h1>
-      <Editor variablesList={arrVarNames} setSavedTemplateStructure={setSavedTemplateStructure} />
+      <Editor variablesList={arrVarNames} setWidgetStructure={setWidgetStructure} />
       <Preview
         variablesList={arrVarNames}
-        savedTemplateStructure={savedTemplateStructure}
+        widgetStructure={widgetStructure}
         onClose={togglePreview}
         isOpen={isOpenPreview}
       />
 
       <div className={styles['MessageTemplateEditor__buttons-wrapper']}>
         <Button title="Preview" onClick={togglePreview} />
-        <Button title="Save" onClick={saveEditorTemplate} />
+        <Button title={isLoading ? 'Loading...' : 'Save'} onClick={handleSave} />
         <Button title="Close editor" onClick={onClose} />
       </div>
     </div>

@@ -2,6 +2,35 @@ import { useState } from 'react';
 import { MessageTemplateEditor } from '../MessageTemplateEditor';
 import { Button } from '../Button';
 import styles from './Main.module.scss';
+import { NestedElement } from '../../types';
+
+// Захардкоженные аргументы для параметров виджета MessageTemplateEditor
+export const arrVarNames = localStorage.arrVarNames
+  ? JSON.parse(localStorage.arrVarNames)
+  : ['firstname', 'lastname', 'company', 'position'];
+
+export const template = localStorage.getItem('template')
+  ? JSON.parse(localStorage.getItem('template')!)
+  : [
+      [
+        {
+          text: 'Hello! You can added here any message!',
+          id: `START-TEXT-AREA`,
+          deepLevel: 1,
+          count: 1,
+          status: 'start',
+        },
+      ],
+    ];
+
+export const callbackSave = (widgetStructure: NestedElement[] | null): Promise<void> => {
+  return new Promise<void>((resolve) => {
+    setTimeout(() => {
+      localStorage.setItem('template', JSON.stringify(widgetStructure));
+      resolve();
+    }, 500);
+  });
+};
 
 const Main = () => {
   const [isOpenMessageTemplateEditor, setIsOpenMessageTemplateEditor] = useState(false);
@@ -55,7 +84,12 @@ const Main = () => {
             repellat laudantium fuga debitis dolore maxime error odio ratione nostrum eligendi
           </p>
         ) : (
-          <MessageTemplateEditor onClose={toggleMessageTemplateEditor} />
+          <MessageTemplateEditor
+            arrVarNames={arrVarNames}
+            template={template}
+            callbackSave={callbackSave}
+            onClose={toggleMessageTemplateEditor}
+          />
         )}
 
         {!isOpenMessageTemplateEditor && (

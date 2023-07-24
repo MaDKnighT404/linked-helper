@@ -5,9 +5,17 @@ import { generateMessage } from '../../../helpers/generateMessage';
 import { NestedElement } from '../../../types';
 import styles from './Preview.module.scss';
 
-
-
-const Preview = ({ variablesList, isOpen, onClose, savedTemplateStructure }: { variablesList: string[]; isOpen: boolean; onClose: () => void; savedTemplateStructure: NestedElement[] | null }) => {
+const Preview = ({
+  variablesList,
+  isOpen,
+  onClose,
+  widgetStructure,
+}: {
+  variablesList: string[];
+  isOpen: boolean;
+  onClose: () => void;
+  widgetStructure: NestedElement[] | null;
+}) => {
   const [inputValues, setInputValues] = useState<Record<string, string>>({});
   const [newTemplate, setNewTemplate] = useState('');
 
@@ -19,11 +27,11 @@ const Preview = ({ variablesList, isOpen, onClose, savedTemplateStructure }: { v
   };
 
   useEffect(() => {
-    if (isOpen && savedTemplateStructure) {
-      const newTemplate = generateMessage(savedTemplateStructure, inputValues);
+    if (isOpen && widgetStructure) {
+      const newTemplate = generateMessage(widgetStructure, inputValues);
       setNewTemplate(newTemplate);
     }
-  }, [isOpen, inputValues, savedTemplateStructure]);
+  }, [isOpen, inputValues, widgetStructure]);
 
   return (
     <div className={`${styles['preview-substrate']} ${isOpen && styles['preview-substrate_open']}`}>
@@ -37,7 +45,11 @@ const Preview = ({ variablesList, isOpen, onClose, savedTemplateStructure }: { v
           {variablesList.map((variable) => (
             <li className={styles.variable} key={variable}>
               <label className={styles.variable__label}>{variable} :</label>
-              <input className={styles.variable__input} type="text" onChange={(e) => handleInputChange(variable, e.target.value)} />
+              <input
+                className={styles.variable__input}
+                type="text"
+                onChange={(e) => handleInputChange(variable, e.target.value)}
+              />
             </li>
           ))}
         </ul>

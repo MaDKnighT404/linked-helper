@@ -1,20 +1,23 @@
 import { useState } from 'react';
 import { nanoid } from 'nanoid';
+import { template } from '../components/Main/Main';
 import { Element, NestedElement } from '../types';
-import { insertBlockAfterFocused, recursiveAdjustment } from '../helpers';
+import { insertBlockAfterFocused, updateTextInElement, recursiveAdjustment } from '../helpers';
 
 const useEditorHooks = () => {
-  const initialEditorStructure = localStorage.getItem('template')
-    ? JSON.parse(localStorage.getItem('template')!)
-    : [[{ text: 'Hello! You can added here any message!', id: `START-TEXT-AREA`, deepLevel: 1, count: 1, status: 'start' }]];
-
-  const [editorStructure, setEditorStructure] = useState<NestedElement[]>(initialEditorStructure);
-  const [focusedElementId, setFocusedElementId] = useState<string | null>('(1)(start)|START-TEXT-AREA');
+  const [editorStructure, setEditorStructure] = useState<NestedElement[]>(template);
+  const [focusedElementId, setFocusedElementId] = useState<string | null>(
+    '(1)(start)|START-TEXT-AREA'
+  );
   const [cursorPosition, setCursorPosition] = useState<number>(0);
   const [deepLevelCounts, setDeepLevelCounts] = useState<{ [key: number]: number }>({ 1: 1 });
 
   const handleSetFocus = (element: HTMLTextAreaElement) => {
     setFocusedElementId(element.id);
+  };
+
+  const handleCursorPositionChange = (position: number) => {
+    setCursorPosition(position);
   };
 
   const handleDeleteButtonClick = (deepLevel: number, count: number) => {
@@ -23,51 +26,22 @@ const useEditorHooks = () => {
   };
 
   const handleTextareaChange = (value: string) => {
-    if (!focusedElementId) return;
-    const rawId = focusedElementId.split('|')[1];
-    const updateTextInNestedArray = (elements: NestedElement[]): NestedElement[] => {
-      return elements.map((element) => {
-        if (Array.isArray(element)) {
-          return updateTextInNestedArray(element);
-        } else {
-          const elementData = element as Element;
-          if (elementData.id === rawId) {
-            return { ...elementData, text: value };
-          }
-          return elementData;
-        }
-      });
-    };
-
-    const newEditorStructure = updateTextInNestedArray(editorStructure);
-    setEditorStructure(newEditorStructure);
+    updateTextInElement(editorStructure, setEditorStructure, focusedElementId, (elementData) => ({
+      ...elementData,
+      text: value,
+    }));
   };
 
   const handleVariableButtonClick = (variableText: string) => {
-    if (!focusedElementId) return;
-    const rawId = focusedElementId.split('|')[1];
-
-    const updateTextInNestedArray = (elements: NestedElement[]): NestedElement[] => {
-      return elements.map((element) => {
-        if (Array.isArray(element)) {
-          return updateTextInNestedArray(element);
-        } else {
-          const elementData = element as Element;
-          if (elementData.id === rawId) {
-            const newText = [elementData.text.slice(0, cursorPosition), variableText, elementData.text.slice(cursorPosition)].join('');
-            return { ...elementData, text: newText };
-          }
-          return elementData;
-        }
-      });
-    };
-    setCursorPosition((prevPosition) => prevPosition + variableText.length);
-    const newEditorStructure = updateTextInNestedArray(editorStructure);
-    setEditorStructure(newEditorStructure);
-  };
-
-  const handleCursorPositionChange = (position: number) => {
-    setCursorPosition(position);
+    updateTextInElement(editorStructure, setEditorStructure, focusedElementId, (elementData) => {
+      const newText = [
+        elementData.text.slice(0, cursorPosition),
+        variableText,
+        elementData.text.slice(cursorPosition),
+      ].join('');
+      setCursorPosition((prevPosition) => prevPosition + variableText.length);
+      return { ...elementData, text: newText };
+    });
   };
 
   const handleAddNewBlock = () => {
@@ -113,10 +87,20 @@ const useEditorHooks = () => {
       { text: '', id: nanoid(), deepLevel: currentDeepLevel, count: newBlockCount, status: 'if' },
       { text: '', id: nanoid(), deepLevel: currentDeepLevel, count: newBlockCount, status: 'then' },
       { text: '', id: nanoid(), deepLevel: currentDeepLevel, count: newBlockCount, status: 'else' },
-      { text: textAfterCursorSplit, id: nanoid(), deepLevel: currentDeepLevel, count: newBlockCount, status: 'end' },
+      {
+        text: textAfterCursorSplit,
+        id: nanoid(),
+        deepLevel: currentDeepLevel,
+        count: newBlockCount,
+        status: 'end',
+      },
     ];
 
-    const newEditorStructure = insertBlockAfterFocused(editorStructureWithUpdatedText, newBlock, rawId);
+    const newEditorStructure = insertBlockAfterFocused(
+      editorStructureWithUpdatedText,
+      newBlock,
+      rawId
+    );
     setFocusedElementId(focusedElementId);
     setEditorStructure(newEditorStructure);
   };
