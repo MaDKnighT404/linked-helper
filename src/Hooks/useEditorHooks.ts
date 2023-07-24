@@ -9,15 +9,16 @@ import { insertBlockAfterFocused, updateTextInElement, recursiveAdjustment } fro
 // так как хук получился очень большой практически вся логика его работы находится во вспомогательных функциях внутри папки helpers
 
 const useEditorHooks = () => {
+  const startFocusedId = '(1)(start)|START-TEXT-AREA';
   const [editorStructure, setEditorStructure] = useState<NestedElement[]>(template);
-  const [focusedElementId, setFocusedElementId] = useState<string | null>(
-    '(1)(start)|START-TEXT-AREA'
-  );
+  const [focusedElementId, setFocusedElementId] = useState<string | null>(startFocusedId);
   const [cursorPosition, setCursorPosition] = useState<number>(0);
   const [deepLevelCounts, setDeepLevelCounts] = useState<{ [key: number]: number }>({ 1: 1 });
+  const [canAddBlock, setCanAddBlock] = useState(false);
 
   const handleSetFocus = (element: HTMLTextAreaElement) => {
     setFocusedElementId(element.id);
+    setCanAddBlock(true);
   };
 
   const handleCursorPositionChange = (position: number) => {
@@ -49,7 +50,7 @@ const useEditorHooks = () => {
   };
 
   const handleAddNewBlock = () => {
-    if (!focusedElementId || cursorPosition === 0) return;
+    if (!focusedElementId || !canAddBlock) return;
 
     const infoSection = focusedElementId.split('|')[0];
     const rawId = focusedElementId.split('|')[1];
@@ -89,8 +90,20 @@ const useEditorHooks = () => {
 
     const newBlock = [
       { text: '', id: nanoid(), deepLevel: currentDeepLevel, count: newBlockCount, status: 'if' },
-      { text: '', id: nanoid(), deepLevel: currentDeepLevel, count: newBlockCount, status: 'then' },
-      { text: '', id: nanoid(), deepLevel: currentDeepLevel, count: newBlockCount, status: 'else' },
+      {
+        text: '',
+        id: nanoid(),
+        deepLevel: currentDeepLevel,
+        count: newBlockCount,
+        status: 'then',
+      },
+      {
+        text: '',
+        id: nanoid(),
+        deepLevel: currentDeepLevel,
+        count: newBlockCount,
+        status: 'else',
+      },
       {
         text: textAfterCursorSplit,
         id: nanoid(),
@@ -106,10 +119,10 @@ const useEditorHooks = () => {
       rawId
     );
     const newBlockid = `(${newBlock[0].deepLevel})(if)|${newBlock[0].id}`;
+    setCanAddBlock(false);
     setFocusedElementId(newBlockid);
     setEditorStructure(newEditorStructure);
   };
-
   return {
     focusedElementId,
     cursorPosition,
