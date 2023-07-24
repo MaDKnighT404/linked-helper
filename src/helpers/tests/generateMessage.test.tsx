@@ -3,14 +3,14 @@ import { NestedElement } from '../../types';
 
 describe('generateMessage function', () => {
   it('should handle empty array', () => {
-    const template: NestedElement[] = [];
+    const template = [] as NestedElement[];
     const values = {};
     const arrVarNames = [''];
     expect(generateMessage(template, values, arrVarNames)).toBe('');
   });
 
   it('should handle single static element', () => {
-    const template: NestedElement[] = [
+    const template = [
       { text: 'Hello', id: 'START-TEXT-AREA', deepLevel: 1, count: 1, status: 'start' },
       [
         { text: '', id: 'IF-TRUE-AREA', deepLevel: 1, count: 2, status: 'if' },
@@ -25,7 +25,7 @@ describe('generateMessage function', () => {
   });
 
   it('should handle multiple static elements', () => {
-    const template: NestedElement[] = [
+    const template = [
       { text: 'Hello', id: 'START-TEXT-AREA', deepLevel: 1, count: 1, status: 'start' },
       [
         { text: '', id: 'IF-TRUE-AREA', deepLevel: 1, count: 2, status: 'if' },
@@ -40,7 +40,7 @@ describe('generateMessage function', () => {
   });
 
   it('should handle single variable', () => {
-    const template: NestedElement[] = [
+    const template = [
       { text: 'Hello {name}', id: 'START-TEXT-AREA', deepLevel: 1, count: 1, status: 'start' },
       [
         { text: 'morning', id: 'IF-TRUE-AREA', deepLevel: 1, count: 2, status: 'if' },

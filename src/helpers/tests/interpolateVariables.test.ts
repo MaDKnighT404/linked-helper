@@ -31,7 +31,7 @@ describe('interpolateVariables function', () => {
 
   it('should return original template if no variables provided', () => {
     const template = 'Hello {name}, how is the {timeOfDay}?';
-    const arrVarNames: string[] = [];
+    const arrVarNames = [''];
     const values = {};
 
     expect(interpolateVariables(template, arrVarNames, values)).toBe(template);
