@@ -26,7 +26,42 @@ const useEditorHooks = () => {
   };
 
   const handleDeleteButtonClick = (deepLevel: number, count: number) => {
+    let endBlockText = '';
+
+    // Find the END block text
+    const findEndBlockText = (elements: NestedElement[]) => {
+      for (let element of elements) {
+        if (Array.isArray(element)) {
+          findEndBlockText(element);
+        } else if (
+          element.deepLevel === deepLevel &&
+          element.count === count &&
+          element.status === 'end'
+        ) {
+          endBlockText = element.text;
+          break;
+        }
+      }
+    };
+
+    findEndBlockText(editorStructure);
+
     const newEditorStructure = recursiveAdjustment(editorStructure, deepLevel, count, deepLevel);
+
+    // Append the END block text to the last non-empty block
+    const appendEndBlockText = (elements: NestedElement[]) => {
+      for (let i = elements.length - 1; i >= 0; i--) {
+        let element = elements[i];
+        if (Array.isArray(element)) {
+          appendEndBlockText(element);
+        } else {
+          element.text += endBlockText;
+          break;
+        }
+      }
+    };
+
+    appendEndBlockText(newEditorStructure);
     setEditorStructure(newEditorStructure);
   };
 
@@ -123,6 +158,7 @@ const useEditorHooks = () => {
     setFocusedElementId(newBlockid);
     setEditorStructure(newEditorStructure);
   };
+
   return {
     focusedElementId,
     cursorPosition,

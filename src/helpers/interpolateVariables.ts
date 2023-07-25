@@ -1,16 +1,16 @@
 //заменяет в переданной строке переменные в виде {variable} на их соответствующие значения.
 const interpolateVariables = (
-  template: string,
+  template: string | null,
   arrVarNames: string[],
   values: Record<string, string>
 ): string => {
-  if (template === undefined) {
+  if (template === null || template === undefined) {
     return '';
   }
 
   const regex = /\{([^}]+)\}/g;
 
-  const generatedMessage = template.replace(regex, (_, variable: string) => {
+  const generatedMessage = template?.replace(regex, (_, variable: string) => {
     // Заменяем только переменные, которые присутствуют в arrVarNames
     if (arrVarNames.includes(variable)) {
       return values[variable] || '';
@@ -20,6 +20,5 @@ const interpolateVariables = (
   });
 
   return generatedMessage;
-}
+};
 export default interpolateVariables;
-

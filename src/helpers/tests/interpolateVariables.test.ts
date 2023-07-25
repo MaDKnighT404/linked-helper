@@ -36,4 +36,20 @@ describe('interpolateVariables function', () => {
 
     expect(interpolateVariables(template, arrVarNames, values)).toBe(template);
   });
+
+  it('should return an empty string if template is null', () => {
+    const values = { variable: 'value' };
+    const arrVarNames = ['variable'];
+    expect(interpolateVariables(null, arrVarNames, values)).toBe('');
+  });
+
+  it('returns the template string unchanged when no replacements are needed', () => {
+    const template = 'Hello, world!';
+    const arrVarNames = ['name'];
+    const values = { name: 'Alice' };
+
+    const result = interpolateVariables(template, arrVarNames, values);
+
+    expect(result).toEqual('Hello, world!');
+  });
 });

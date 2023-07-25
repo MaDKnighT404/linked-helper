@@ -27,7 +27,7 @@ const Editor = ({
   useEffect(() => {
     setWidgetStructure(editorStructure);
   }, [editorStructure, setWidgetStructure]);
-
+  console.log(editorStructure)
   // функция для обхода структуры редактора и создания из неё разметки.
   const renderTextareaElements = (elements: NestedElement[]): JSX.Element[] => {
     return elements.map((element, index) => {

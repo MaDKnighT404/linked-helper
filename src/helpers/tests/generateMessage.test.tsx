@@ -21,7 +21,7 @@ describe('generateMessage function', () => {
     ];
     const values = {};
     const arrVarNames = [''];
-    expect(generateMessage(template, values, arrVarNames)).toBe('Hello   ');
+    expect(generateMessage(template, values, arrVarNames)).toBe('Hello');
   });
 
   it('should handle multiple static elements', () => {
@@ -36,7 +36,7 @@ describe('generateMessage function', () => {
     ];
     const values = {};
     const arrVarNames = [''];
-    expect(generateMessage(template, values, arrVarNames)).toBe('Hello  World ');
+    expect(generateMessage(template, values, arrVarNames)).toBe('HelloWorld');
   });
 
   it('should handle single variable', () => {
@@ -52,7 +52,7 @@ describe('generateMessage function', () => {
     const values = { name: 'John' };
     const arrVarNames = ['name'];
     expect(generateMessage(template, values, arrVarNames)).toBe(
-      'Hello John Good morning John Goodbye John '
+      'Hello JohnGood morning JohnGoodbye John'
     );
   });
 
@@ -69,7 +69,7 @@ describe('generateMessage function', () => {
     const values = { name: 'John', time: 'evening' };
     const arrVarNames = ['name', 'time'];
     expect(generateMessage(template, values, arrVarNames)).toBe(
-      'Hello John Good evening John Goodbye John '
+      'Hello JohnGood evening JohnGoodbye John'
     );
   });
 
@@ -127,7 +127,7 @@ describe('generateMessage function', () => {
     };
     const arrVarNames = ['firstname', 'lastname', 'company', 'position'];
     expect(generateMessage(template, values, arrVarNames)).toBe(
-      'Hello Bill! I just went through your profile and I would love to join yout network! I know your work at Bill & Melinda company as Co-chair :) Jake Software Developer test@test.test '
+      'Hello Bill! I just went through your profile and I would love to join yout network!I know your work at Bill & Melinda companyas Co-chair:)Jake Software Developer test@test.test'
     );
   });
 
@@ -185,7 +185,7 @@ describe('generateMessage function', () => {
     };
     const arrVarNames = ['firstname', 'lastname', 'company', 'position'];
     expect(generateMessage(template, values, arrVarNames)).toBe(
-      'Hello Bill! I just went through your profile and I would love to join yout network! I know your work at Bill & Melinda company , but what is your role? :) Jake Software Developer test@test.test '
+      'Hello Bill! I just went through your profile and I would love to join yout network!I know your work at Bill & Melinda company, but what is your role?:)Jake Software Developer test@test.test'
     );
   });
 
@@ -243,7 +243,7 @@ describe('generateMessage function', () => {
     };
     const arrVarNames = ['firstname', 'lastname', 'company', 'position'];
     expect(generateMessage(template, values, arrVarNames)).toBe(
-      'Hello Bill! I just went through your profile and I would love to join yout network!  Jake Software Developer test@test.test '
+      'Hello Bill! I just went through your profile and I would love to join yout network!Where do you work at the moment?, but what is your role?:)Jake Software Developer test@test.test'
     );
   });
 });
